@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SIMServer", "SIMServer\SIMS
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SIMCommon", "SIMCommon\SIMCommon.csproj", "{463CB016-6B99-4BDE-851F-560006EAEE00}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Debug", "Debug\Debug.csproj", "{0080568E-975C-4FA2-B632-A7BE5C1C56FE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{463CB016-6B99-4BDE-851F-560006EAEE00}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{463CB016-6B99-4BDE-851F-560006EAEE00}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{463CB016-6B99-4BDE-851F-560006EAEE00}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0080568E-975C-4FA2-B632-A7BE5C1C56FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0080568E-975C-4FA2-B632-A7BE5C1C56FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0080568E-975C-4FA2-B632-A7BE5C1C56FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0080568E-975C-4FA2-B632-A7BE5C1C56FE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
