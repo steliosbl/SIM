@@ -1,11 +1,11 @@
 ﻿namespace SIMServer
 {
-    class SIMUser
+    public class SIMUser
     {
         public SIMUser(int id, string username, string rawPassword)
         {
             this.ID = id;
-            this.Usernaame = username;
+            this.Username = username;
             this.GenerateSalt();
             this.Password = this.HashPassword(rawPassword);
             this.Nickname = username;
@@ -14,7 +14,7 @@
         public SIMUser(int id, string username, string password, string salt, string nickname)
         {
             this.ID = id;
-            this.Usernaame = username;
+            this.Username = username;
             this.Password = password;
             this.Salt = salt;
             this.Nickname = nickname;
@@ -22,7 +22,7 @@
 
         public int ID { get; private set; }
 
-        public string Usernaame { get; private set; }
+        public string Username { get; private set; }
 
         public string Password { get; private set; }
 
