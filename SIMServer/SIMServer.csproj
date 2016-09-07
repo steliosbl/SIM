@@ -57,6 +57,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SIMServer.AuthDB.cs" />
     <Compile Include="SIMServer.Config.cs" />
+    <Compile Include="Responses\SIMServer.Responses.Base.cs" />
+    <Compile Include="Responses\SIMServer.Responses.BeginCommunication.cs" />
     <Compile Include="SIMServer.User.cs" />
   </ItemGroup>
   <ItemGroup>

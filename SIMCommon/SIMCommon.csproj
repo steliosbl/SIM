@@ -47,19 +47,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="SIMCommon.Requests\SIMCommon.Requests.EndCommunication.cs" />
-    <Compile Include="SIMCommon\SIMCommon.Constants.cs" />
+    <Compile Include="Requests\SIMCommon.Requests.EndCommunication.cs" />
+    <Compile Include="SIMCommon.Constants.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SIMCommon\SIMCommon.Message.cs" />
-    <Compile Include="SIMCommon.Requests\SIMCommon.Requests.Authenticate.cs" />
-    <Compile Include="SIMCommon.Requests\SIMCommon.Requests.Base.cs" />
-    <Compile Include="SIMCommon.Requests\SIMCommon.Requests.BeginCommunication.cs" />
-    <Compile Include="SIMCommon.Requests\SIMCommon.Requests.SendMessage.cs" />
-    <Compile Include="SIMCommon.Requests\SIMCommon.Requests.UserRef.cs" />
+    <Compile Include="SIMCommon.Message.cs" />
+    <Compile Include="Requests\SIMCommon.Requests.Authenticate.cs" />
+    <Compile Include="Requests\SIMCommon.Requests.Base.cs" />
+    <Compile Include="Requests\SIMCommon.Requests.BeginCommunication.cs" />
+    <Compile Include="Requests\SIMCommon.Requests.SendMessage.cs" />
+    <Compile Include="Requests\SIMCommon.Requests.UserRef.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <Compile Include="SIMCommon.Requests\SIMCommon.Requests.SignOut.cs" />
+    <Compile Include="Requests\SIMCommon.Requests.SignOut.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
