@@ -1,4 +1,4 @@
-﻿namespace SIMServer.Responses
+﻿namespace SIMCommon.Responses
 {
     using System;
 

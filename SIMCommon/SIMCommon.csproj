@@ -47,6 +47,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Responses\SIMCommon.Responses.Authenticate.cs" />
+    <Compile Include="Responses\SIMCommon.Responses.Base.cs" />
+    <Compile Include="Responses\SIMCommon.Responses.BeginCommunication.cs" />
     <Compile Include="Requests\SIMCommon.Requests.EndCommunication.cs" />
     <Compile Include="Requests\SIMCommon.Requests.SignIn.cs" />
     <Compile Include="SIMCommon.Constants.cs" />
