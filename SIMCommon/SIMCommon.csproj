@@ -48,6 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Requests\SIMCommon.Requests.EndCommunication.cs" />
+    <Compile Include="Requests\SIMCommon.Requests.SignIn.cs" />
     <Compile Include="SIMCommon.Constants.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SIMCommon.Message.cs" />
