@@ -56,7 +56,9 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SIMServer.AuthDB.cs" />
+    <Compile Include="SIMServer.Client.cs" />
     <Compile Include="SIMServer.Config.cs" />
+    <Compile Include="SIMServer.Main.cs" />
     <Compile Include="SIMServer.User.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -30,14 +30,14 @@
 
         public string Nickname { get; private set; }
 
+        public bool Authenticate(string inputPassword)
+        {
+            return this.HashPassword(inputPassword) == this.Password;
+        }
+
         private void GenerateSalt()
         {
             this.Salt = System.Guid.NewGuid().ToString();
-        }
-
-        private bool Authenticate(string inputPassword)
-        {
-            return this.HashPassword(inputPassword) == this.Password;
         }
 
         private string HashPassword(string inputPassword)
