@@ -47,11 +47,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Responses\SIMCommon.Responses.SignIn.cs" />
     <Compile Include="Responses\SIMCommon.Responses.Authenticate.cs" />
     <Compile Include="Responses\SIMCommon.Responses.Base.cs" />
     <Compile Include="Responses\SIMCommon.Responses.BeginCommunication.cs" />
     <Compile Include="Requests\SIMCommon.Requests.EndCommunication.cs" />
     <Compile Include="Requests\SIMCommon.Requests.SignIn.cs" />
+    <Compile Include="Responses\SIMCommon.Responses.EndCommunication.cs" />
+    <Compile Include="Responses\SIMCommon.Responses.SendMessage.cs" />
+    <Compile Include="Responses\SIMCommon.Responses.SignOut.cs" />
+    <Compile Include="Responses\SIMCommon.Responses.UserRef.cs" />
     <Compile Include="SIMCommon.Constants.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SIMCommon.Message.cs" />
