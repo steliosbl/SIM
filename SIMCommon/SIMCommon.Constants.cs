@@ -1,6 +1,6 @@
 ﻿namespace SIMCommon
 {
-    public static class GlobalConstants
+    public static class Constants
     {
         public const int TcpStreamByteSize = 512;
         public const int SIMServerPort = 13197;

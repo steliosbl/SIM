@@ -3,9 +3,9 @@
     using System;
     using Newtonsoft.Json;
 
-    public class SIMMessage
+    public class Message
     {
-        public SIMMessage(int senderID, int recipientID, string text)
+        public Message(int senderID, int recipientID, string text)
         {
             this.SenderID = senderID;
             this.RecipientID = recipientID;
@@ -14,7 +14,7 @@
         }
 
         [JsonConstructor]
-        public SIMMessage(int senderID, int recipientID, string text, DateTime timestamp)
+        public Message(int senderID, int recipientID, string text, DateTime timestamp)
         {
             this.SenderID = senderID;
             this.RecipientID = recipientID;

@@ -47,9 +47,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GlobalConstants.cs" />
+    <Compile Include="SIMCommon.Constants.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SIMMessage.cs" />
+    <Compile Include="SIMCommon.Message.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

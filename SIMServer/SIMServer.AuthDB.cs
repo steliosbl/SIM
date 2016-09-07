@@ -8,9 +8,9 @@
     using MySql.Data.MySqlClient;
     using SDatabase.MySQL;
 
-    public class SIMAuthDB
+    public class AuthDB
     {
-        public SIMAuthDB(ConnectionData connectionData)
+        public AuthDB(ConnectionData connectionData)
         {
             this.ConnectionString = new ConnectionString(connectionData);
             this.Connection = new MySqlConnection(this.ConnectionString.Text);
@@ -26,14 +26,14 @@
             using (var cmd = new MySqlCommand("SELECT MAX (ID) FROM @table;", this.Connection))
             {
                 cmd.Prepare();
-                cmd.Parameters.AddWithValue("@table", SIMCommon.GlobalConstants.SIMAuthDBUserTable);
+                cmd.Parameters.AddWithValue("@table", SIMCommon.Constants.SIMAuthDBUserTable);
                 try
                 {
                     return System.Convert.ToInt32(cmd.ExecuteScalar());
                 }
-                // Caused if there are no users in the table.
                 catch (FormatException)
                 {
+                    // Caused if there are no users in the table.
                     return 0;
                 }
             }
@@ -46,7 +46,7 @@
                 using (var cmd = new MySqlCommand("SELECT * FROM @table WHERE Username = @username;", this.Connection))
                 {
                     cmd.Prepare();
-                    cmd.Parameters.AddWithValue("@table", SIMCommon.GlobalConstants.SIMAuthDBUserTable);
+                    cmd.Parameters.AddWithValue("@table", SIMCommon.Constants.SIMAuthDBUserTable);
                     cmd.Parameters.AddWithValue("@username", username);
                     using (var rdr = cmd.ExecuteReader())
                     {
@@ -67,7 +67,7 @@
                 using (var cmd = new MySqlCommand("SELECT * FROM @table WHERE ID = @id;", this.Connection))
                 {
                     cmd.Prepare();
-                    cmd.Parameters.AddWithValue("@table", SIMCommon.GlobalConstants.SIMAuthDBUserTable);
+                    cmd.Parameters.AddWithValue("@table", SIMCommon.Constants.SIMAuthDBUserTable);
                     cmd.Parameters.AddWithValue("@id", id);
                     using (var rdr = cmd.ExecuteReader())
                     {
@@ -86,7 +86,7 @@
             using (var cmd = new MySqlCommand("SELECT EXISTS(SELECT * FROM @table WHERE ID = @id LIMIT 1);", this.Connection))
             {
                 cmd.Prepare();
-                cmd.Parameters.AddWithValue("@table", SIMCommon.GlobalConstants.SIMAuthDBUserTable);
+                cmd.Parameters.AddWithValue("@table", SIMCommon.Constants.SIMAuthDBUserTable);
                 cmd.Parameters.AddWithValue("@id", id);
                 return System.Convert.ToBoolean(cmd.ExecuteScalar());
             }
@@ -97,22 +97,22 @@
             using (var cmd = new MySqlCommand("SELECT EXISTS(SELECT * FROM @table WHERE Username = @username LIMIT 1);", this.Connection))
             {
                 cmd.Prepare();
-                cmd.Parameters.AddWithValue("@table", SIMCommon.GlobalConstants.SIMAuthDBUserTable);
+                cmd.Parameters.AddWithValue("@table", SIMCommon.Constants.SIMAuthDBUserTable);
                 cmd.Parameters.AddWithValue("@username", username);
                 return System.Convert.ToBoolean(cmd.ExecuteScalar());
             }
         }
 
-        public SIMUser GetUser(int id)
+        public User GetUser(int id)
         {
             if (this.UserExists(id))
             {
                 using (var cmd = new MySqlCommand("SELECT * FROM @table WHERE ID = @id;", this.Connection))
                 {
                     cmd.Prepare();
-                    cmd.Parameters.AddWithValue("@table", SIMCommon.GlobalConstants.SIMAuthDBUserTable);
+                    cmd.Parameters.AddWithValue("@table", SIMCommon.Constants.SIMAuthDBUserTable);
                     cmd.Parameters.AddWithValue("@id", id);
-                    return SDatabase.MySQL.Convert.DeserializeObject<SIMUser>(cmd);
+                    return SDatabase.MySQL.Convert.DeserializeObject<User>(cmd);
                 }
             }
             else
