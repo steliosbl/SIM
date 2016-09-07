@@ -47,6 +47,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="SIMCommon.Requests\SIMCommon.Requests.EndCommunication.cs" />
     <Compile Include="SIMCommon\SIMCommon.Constants.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SIMCommon\SIMCommon.Message.cs" />
@@ -58,6 +59,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <Compile Include="SIMCommon.Requests\SIMCommon.Requests.SignOut.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
