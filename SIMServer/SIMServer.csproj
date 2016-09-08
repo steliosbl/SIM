@@ -59,6 +59,7 @@
     <Compile Include="SIMServer.Client.cs" />
     <Compile Include="SIMServer.Config.cs" />
     <Compile Include="SIMServer.Main.cs" />
+    <Compile Include="SIMServer.Listener.cs" />
     <Compile Include="SIMServer.User.cs" />
   </ItemGroup>
   <ItemGroup>
