@@ -47,6 +47,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Requests\SIMCommon.Requests.Encrypted.cs" />
     <Compile Include="Responses\SIMCommon.Responses.NoLease.cs" />
     <Compile Include="Responses\SIMCommon.Responses.SignIn.cs" />
     <Compile Include="Responses\SIMCommon.Responses.Authenticate.cs" />
