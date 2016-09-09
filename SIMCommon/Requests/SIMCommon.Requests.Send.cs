@@ -1,8 +1,8 @@
 ﻿namespace SIMCommon.Requests
 {
-    public sealed class SendMessage : Base
+    public sealed class Send : Base
     {
-        public SendMessage(Message message) : base()
+        public Send(Message message) : base()
         {
             this.Message = message;
         }

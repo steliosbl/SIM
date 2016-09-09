@@ -48,6 +48,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Requests\SIMCommon.Requests.Encrypted.cs" />
+    <Compile Include="Requests\SIMCommon.Requests.Get.cs" />
+    <Compile Include="Responses\SIMCommon.Responses.Get.cs" />
     <Compile Include="Responses\SIMCommon.Responses.NoLease.cs" />
     <Compile Include="Responses\SIMCommon.Responses.SignIn.cs" />
     <Compile Include="Responses\SIMCommon.Responses.Authenticate.cs" />
@@ -56,7 +58,7 @@
     <Compile Include="Requests\SIMCommon.Requests.EndCommunication.cs" />
     <Compile Include="Requests\SIMCommon.Requests.SignIn.cs" />
     <Compile Include="Responses\SIMCommon.Responses.EndCommunication.cs" />
-    <Compile Include="Responses\SIMCommon.Responses.SendMessage.cs" />
+    <Compile Include="Responses\SIMCommon.Responses.Send.cs" />
     <Compile Include="Responses\SIMCommon.Responses.SignOut.cs" />
     <Compile Include="Responses\SIMCommon.Responses.UserRef.cs" />
     <Compile Include="SIMCommon.Constants.cs" />
@@ -66,7 +68,7 @@
     <Compile Include="Requests\SIMCommon.Requests.Authenticate.cs" />
     <Compile Include="Requests\SIMCommon.Requests.Base.cs" />
     <Compile Include="Requests\SIMCommon.Requests.BeginCommunication.cs" />
-    <Compile Include="Requests\SIMCommon.Requests.SendMessage.cs" />
+    <Compile Include="Requests\SIMCommon.Requests.Send.cs" />
     <Compile Include="Requests\SIMCommon.Requests.UserRef.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -8,5 +8,6 @@
         public const string SIMAuthDBUserTable = "SIMUSERS";
         public const string SIMServerConfigFilename = "SIMServer.cfg";
         public const string SIMServerInvalidRequestResponse = "NULL";
+        public const string SIMServerBacklogFilename = "SIMServer.backlog.json";
     }
 }
