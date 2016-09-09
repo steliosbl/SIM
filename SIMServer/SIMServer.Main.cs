@@ -74,6 +74,26 @@
 
         private void UnknownRequestHandler(EventArgs e, SIMCommon.Requests.Base request, IPAddress address)
         {
+            string response;
+            if (request.RequestType == typeof(SIMCommon.Requests.BeginCommunication))
+            {
+                if (!this.Clients.Keys.Contains(address))
+                {
+                    this.Clients.Add(address, new Client(address));
+                    var result = new SIMCommon.Responses.BeginCommunication(this.Clients[address].PGPClient.PublicKey, this.Config.LeaseDuration);
+                    response = JsonConvert.SerializeObject(result);
+                }
+                else
+                {
+                    response = SIMCommon.Constants.SIMServerInvalidRequestResponse;
+                }
+            }
+            else
+            {
+                response = SIMCommon.Constants.SIMServerInvalidRequestResponse;
+            }
+
+            this.Listener.Respond(response);
         }
 
         private string ProcessRequest(string decryptedRequest, IPAddress address)
