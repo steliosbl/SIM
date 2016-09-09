@@ -27,9 +27,19 @@
             this.User = user;
         }
 
+        public void RemoveUser()
+        {
+            this.User = null;
+        }
+
         public void RenewLease()
         {
             this.LeaseStart = DateTime.Now;
+        }
+
+        public bool CheckLeaseExpired(int duration)
+        {
+            return ((int)(DateTime.Now - this.LeaseStart).TotalMilliseconds) > duration;
         }
     }
 }

@@ -38,11 +38,11 @@
             }
         }
 
-        public delegate void ReceivedDataHandler(object sender, EventArgs e, string data, IPAddress address);
+        public delegate void ReceivedDataHandler(EventArgs e, string data, IPAddress address);
 
-        public delegate void ReceivedClientRequestHandler(Listener sender, EventArgs e, string encryptedRequest, IPAddress address);
+        public delegate void ReceivedClientRequestHandler(EventArgs e, SIMCommon.Requests.Encrypted request, IPAddress address);
 
-        public delegate void ReceivedUnknownRequestHandler(Listener sender, EventArgs e, SIMCommon.Requests.Base request, IPAddress address);
+        public delegate void ReceivedUnknownRequestHandler(EventArgs e, SIMCommon.Requests.Base request, IPAddress address);
 
         public event ReceivedDataHandler ReceivedData;
 
@@ -96,15 +96,15 @@
         {
             if (this.ReceivedData != null)
             {
-                this.ReceivedData(this, e, data, address);
+                this.ReceivedData(e, data, address);
             }
         }
 
-        protected virtual void OnReceivedClientRequest(EventArgs e, string encryptedRequest, IPAddress address)
+        protected virtual void OnReceivedClientRequest(EventArgs e, SIMCommon.Requests.Encrypted request, IPAddress address)
         {
             if (this.ReceivedClientRequest != null)
             {
-                this.ReceivedClientRequest(this, e, encryptedRequest, address);
+                this.ReceivedClientRequest(e, request, address);
             }
         }
 
@@ -112,19 +112,31 @@
         {
             if (this.ReceivedUnknownRequest != null)
             {
-                this.ReceivedUnknownRequest(this, e, request, address);
+                this.ReceivedUnknownRequest(e, request, address);
             }
         }
 
-        private void ReceivedDataSifter(object sender, EventArgs e, string data, IPAddress address)
+        private void ReceivedDataSifter(EventArgs e, string data, IPAddress address)
         {
-            if (this.clients.Contains(address))
+            try
             {
-                this.OnReceivedClientRequest(e, data, address);
+                JsonSerializerSettings settings = new JsonSerializerSettings();
+                settings.MissingMemberHandling = MissingMemberHandling.Error;
+
+                if (this.clients.Contains(address))
+                {
+                    var request = JsonConvert.DeserializeObject<SIMCommon.Requests.Encrypted>(data, settings);
+                    this.OnReceivedClientRequest(e, request, address);
+                }
+                else
+                {
+                    var request = JsonConvert.DeserializeObject<SIMCommon.Requests.Base>(data, settings);
+                    this.OnReceivedUnknownRequest(e, request, address);
+                }
             }
-            else
+            catch (JsonException)
             {
-                this.OnReceivedUnknownRequest(e, JsonConvert.DeserializeObject<SIMCommon.Requests.Base>(data), address);
+                this.Respond(SIMCommon.Constants.SIMServerInvalidRequestResponse);
             }
         }
     }
