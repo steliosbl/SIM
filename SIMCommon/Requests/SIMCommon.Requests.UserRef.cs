@@ -4,11 +4,11 @@
 
     public sealed class UserRef : Base
     {
-        public UserRef(List<string> usernames) : base()
+        public UserRef(int id) : base()
         {
-            this.Usernames = usernames;
+            this.ID = id;
         }
 
-        public List<string> Usernames { get; private set; }
+        public int ID { get; private set; }
     }
 }
