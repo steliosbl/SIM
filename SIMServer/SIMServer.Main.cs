@@ -32,6 +32,9 @@
                 var backlogInterface = new SIMCommon.JsonFileInterface(SIMCommon.Constants.SIMServerBacklogFilename);
                 this.Backlog = backlogInterface.GetObject<Backlog>();
             }
+
+            this.LeaseMonitor = new Thread(() => this.MonitorLeases());
+            this.LeaseMonitor.Start();
         }
 
         public Dictionary<IPAddress, Client> Clients { get; private set; }
@@ -43,6 +46,8 @@
         public AuthDB Database { get; private set; }
 
         public Backlog Backlog { get; private set; }
+
+        public Thread LeaseMonitor { get; private set; }
 
         private void ClientRequestHandler(EventArgs e, SIMCommon.Requests.Encrypted encryptedRequest, IPAddress address)
         {
@@ -201,6 +206,23 @@
             }
 
             return null;
+        }
+
+        private void MonitorLeases()
+        {
+            while (true)
+            {
+                foreach (var client in this.Clients.Keys)
+                {
+                    if (!this.Clients[client].CheckLeaseExpired(this.Config.LeaseDuration))
+                    {
+                        this.Clients.Remove(client);
+                        this.Listener.UpdateClients(this.Clients.Keys.ToList());
+                    }
+                }
+
+                Thread.Sleep(100);
+            }
         }
     }
 }
