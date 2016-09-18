@@ -49,8 +49,10 @@
   <ItemGroup>
     <Compile Include="Requests\SIMCommon.Requests.Encrypted.cs" />
     <Compile Include="Requests\SIMCommon.Requests.Get.cs" />
+    <Compile Include="Requests\SIMCommon.Requests.RegisteredUsers.cs" />
     <Compile Include="Responses\SIMCommon.Responses.Get.cs" />
     <Compile Include="Responses\SIMCommon.Responses.NoLease.cs" />
+    <Compile Include="Responses\SIMCommon.Responses.RegisteredUsers.cs" />
     <Compile Include="Responses\SIMCommon.Responses.SignIn.cs" />
     <Compile Include="Responses\SIMCommon.Responses.Authenticate.cs" />
     <Compile Include="Responses\SIMCommon.Responses.Base.cs" />
@@ -70,6 +72,7 @@
     <Compile Include="Requests\SIMCommon.Requests.BeginCommunication.cs" />
     <Compile Include="Requests\SIMCommon.Requests.Send.cs" />
     <Compile Include="Requests\SIMCommon.Requests.UserRef.cs" />
+    <Compile Include="SIMCommon.UserProfile.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

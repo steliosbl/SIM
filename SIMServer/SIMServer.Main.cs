@@ -98,7 +98,7 @@
 
         private string ProcessRequest(string decryptedRequest, IPAddress address)
         {
-            string response;
+            string response = null;
             var baseRequest = JsonConvert.DeserializeObject<SIMCommon.Requests.Base>(decryptedRequest);
             if (baseRequest.RequestType == typeof(SIMCommon.Requests.Base))
             {
@@ -137,6 +137,23 @@
                 {
                     response = JsonConvert.SerializeObject(new SIMCommon.Responses.Get(null));
                 }
+            }
+            else if (baseRequest.RequestType == typeof(SIMCommon.Requests.RegisteredUsers))
+            {
+                var profs = new Dictionary<int, SIMCommon.UserProfile>();
+                foreach (var client in this.Clients.Values.ToList().FindAll(client => client.User != null))
+                {
+                    profs.Add(client.User.ID, new SIMCommon.UserProfile(client.User.ID, client.User.Nickname, true));
+                }
+
+                var allProfiles = this.Database.GetProfiles();
+                foreach (var profile in allProfiles.FindAll(profile => !profs.ContainsKey(profile.ID)))
+                {
+                    profs.Add(profile.ID, profile);
+                }
+
+                var result = new SIMCommon.Responses.RegisteredUsers(profs.Values.ToList());
+                response = JsonConvert.SerializeObject(result);
             }
             else if (baseRequest.RequestType == typeof(SIMCommon.Requests.Send))
             {

@@ -120,5 +120,24 @@
                 throw new ArgumentException("User does not exist.");
             }
         }
+
+        public List<SIMCommon.UserProfile> GetProfiles()
+        {
+            var result = new List<SIMCommon.UserProfile>();
+            using (var cmd = new MySqlCommand("SELECT ID, Nickname FROM @table;", this.Connection))
+            {
+                cmd.Prepare();
+                cmd.Parameters.AddWithValue("@table", SIMCommon.Constants.SIMAuthDBUserTable);
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        result.Add(new SIMCommon.UserProfile(reader.GetInt32(0), reader.GetString(1)));
+                    }
+                }
+            }
+
+            return result;
+        }
     }
 }
