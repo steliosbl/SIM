@@ -1,8 +1,8 @@
 ﻿namespace SIMCommon.Responses
 {
-    public sealed class SignIn : Base
+    public sealed class Register : Base
     {
-        public SignIn(bool success) : base()
+        public Register(bool success) : base()
         {
             this.Success = success;
         }

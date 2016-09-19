@@ -138,6 +138,15 @@
                     response = JsonConvert.SerializeObject(new SIMCommon.Responses.Get(null));
                 }
             }
+            else if (baseRequest.RequestType == typeof(SIMCommon.Requests.Register))
+            {
+                var request = JsonConvert.DeserializeObject<SIMCommon.Requests.Register>(decryptedRequest);
+                if (!this.Database.UserExists(request.Username))
+                {
+                    var newUser = new User(this.Database.GetLastUserID() + 1, request.Username, request.Password);
+                    this.Database.AddUser(newUser);
+                }
+            }
             else if (baseRequest.RequestType == typeof(SIMCommon.Requests.RegisteredUsers))
             {
                 var profs = new Dictionary<int, SIMCommon.UserProfile>();

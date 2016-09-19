@@ -2,11 +2,11 @@
 {
     public class Authenticate : Base
     {
-        public Authenticate(bool response) : base()
+        public Authenticate(bool success) : base()
         {
-            this.Response = response;
+            this.Success = success;
         }
 
-        public bool Response { get; private set; }
+        public bool Success { get; private set; }
     }
 }

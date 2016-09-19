@@ -49,9 +49,11 @@
   <ItemGroup>
     <Compile Include="Requests\SIMCommon.Requests.Encrypted.cs" />
     <Compile Include="Requests\SIMCommon.Requests.Get.cs" />
+    <Compile Include="Requests\SIMCommon.Requests.Register.cs" />
     <Compile Include="Requests\SIMCommon.Requests.RegisteredUsers.cs" />
     <Compile Include="Responses\SIMCommon.Responses.Get.cs" />
     <Compile Include="Responses\SIMCommon.Responses.NoLease.cs" />
+    <Compile Include="Responses\SIMCommon.Responses.Register.cs" />
     <Compile Include="Responses\SIMCommon.Responses.RegisteredUsers.cs" />
     <Compile Include="Responses\SIMCommon.Responses.SignIn.cs" />
     <Compile Include="Responses\SIMCommon.Responses.Authenticate.cs" />
