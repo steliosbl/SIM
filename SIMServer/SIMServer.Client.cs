@@ -6,12 +6,13 @@
 
     public class Client
     {
-        public Client(IPAddress address)
+        public Client(IPAddress address, string publicKey)
         {
             this.Address = address;
             this.PGPClient = new SCrypto.PGP.SPGP();
             this.User = null;
             this.LeaseStart = DateTime.Now;
+            this.PublicKey = publicKey;
         }
 
         public DateTime LeaseStart { get; private set; }
@@ -21,6 +22,8 @@
         public IPAddress Address { get; private set; }
 
         public User User { get; private set; }
+
+        public string PublicKey { get; private set; }
 
         public void LoadUser(User user)
         {
@@ -44,7 +47,7 @@
 
         public int RemainingLeaseTime(int duration)
         {
-            return ((int)(DateTime.Now - this.LeaseStart).TotalMilliseconds);
+            return (int)(DateTime.Now - this.LeaseStart).TotalMilliseconds;
         }
     }
 }

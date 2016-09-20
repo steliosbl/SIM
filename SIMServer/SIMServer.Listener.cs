@@ -40,9 +40,9 @@
 
         public delegate void ReceivedDataHandler(EventArgs e, string data, IPAddress address);
 
-        public delegate void ReceivedClientRequestHandler(EventArgs e, SIMCommon.Requests.Encrypted request, IPAddress address);
+        public delegate void ReceivedClientRequestHandler(EventArgs e, string request, IPAddress address);
 
-        public delegate void ReceivedUnknownRequestHandler(EventArgs e, SIMCommon.Requests.Base request, IPAddress address);
+        public delegate void ReceivedUnknownRequestHandler(EventArgs e, string request, IPAddress address);
 
         public event ReceivedDataHandler ReceivedData;
 
@@ -100,7 +100,7 @@
             }
         }
 
-        protected virtual void OnReceivedClientRequest(EventArgs e, SIMCommon.Requests.Encrypted request, IPAddress address)
+        protected virtual void OnReceivedClientRequest(EventArgs e, string request, IPAddress address)
         {
             if (this.ReceivedClientRequest != null)
             {
@@ -108,7 +108,7 @@
             }
         }
 
-        protected virtual void OnReceivedUnknownRequest(EventArgs e, SIMCommon.Requests.Base request, IPAddress address)
+        protected virtual void OnReceivedUnknownRequest(EventArgs e, string request, IPAddress address)
         {
             if (this.ReceivedUnknownRequest != null)
             {
@@ -126,12 +126,12 @@
                 if (this.clients.Contains(address))
                 {
                     var request = JsonConvert.DeserializeObject<SIMCommon.Requests.Encrypted>(data, settings);
-                    this.OnReceivedClientRequest(e, request, address);
+                    this.OnReceivedClientRequest(e, data, address);
                 }
                 else
                 {
                     var request = JsonConvert.DeserializeObject<SIMCommon.Requests.Base>(data, settings);
-                    this.OnReceivedUnknownRequest(e, request, address);
+                    this.OnReceivedUnknownRequest(e, data, address);
                 }
             }
             catch (JsonException)

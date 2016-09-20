@@ -49,8 +49,9 @@
 
         public Thread LeaseMonitor { get; private set; }
 
-        private void ClientRequestHandler(EventArgs e, SIMCommon.Requests.Encrypted encryptedRequest, IPAddress address)
+        private void ClientRequestHandler(EventArgs e, string data, IPAddress address)
         {
+            var encryptedRequest = JsonConvert.DeserializeObject<SIMCommon.Requests.Encrypted>(data);
             if (this.Clients.Keys.Contains(address))
             {
                 var targetClient = this.Clients[address];
@@ -58,7 +59,8 @@
                 {
                     string decryptedRequest = targetClient.PGPClient.Decrypt(encryptedRequest.EncryptedRequest, encryptedRequest.EncryptedSessionKey);
                     string response = this.ProcessRequest(decryptedRequest, address);
-                    this.Listener.Respond(response);
+                    string encryptedResponse = targetClient.PGPClient.Encrypt(response, targetClient.PublicKey);
+                    this.Listener.Respond(encryptedResponse);
                 }
                 else
                 {
@@ -68,18 +70,20 @@
             }
             else
             {
-                this.UnknownRequestHandler(e, encryptedRequest, address);
+                this.UnknownRequestHandler(e, data, address);
             }
         }
 
-        private void UnknownRequestHandler(EventArgs e, SIMCommon.Requests.Base request, IPAddress address)
+        private void UnknownRequestHandler(EventArgs e, string data, IPAddress address)
         {
             string response;
-            if (request.RequestType == typeof(SIMCommon.Requests.BeginCommunication))
+            var baseRequest = JsonConvert.DeserializeObject<SIMCommon.Requests.Base>(data);
+            if (baseRequest.RequestType == typeof(SIMCommon.Requests.BeginCommunication))
             {
                 if (!this.Clients.Keys.Contains(address))
                 {
-                    this.Clients.Add(address, new Client(address));
+                    var request = JsonConvert.DeserializeObject<SIMCommon.Requests.BeginCommunication>(data);
+                    this.Clients.Add(address, new Client(address, request.PublicKey));
                     var result = new SIMCommon.Responses.BeginCommunication(this.Clients[address].PGPClient.PublicKey, this.Config.LeaseDuration);
                     response = JsonConvert.SerializeObject(result);
                 }
