@@ -164,6 +164,18 @@
                 var result = new SIMCommon.Responses.RegisteredUsers(profs.Values.ToList());
                 response = JsonConvert.SerializeObject(result);
             }
+            else if (baseRequest.RequestType == typeof(SIMCommon.Requests.Renew))
+            {
+                if (this.Clients[address].RemainingLeaseTime(this.Config.LeaseDuration) <= SIMCommon.Constants.LeaseMonitorDelay)
+                {
+                    this.Clients[address].RenewLease();
+                    response = JsonConvert.SerializeObject(new SIMCommon.Responses.Renew());
+                }
+                else
+                {
+                    response = SIMCommon.Constants.SIMServerInvalidRequestResponse;
+                }
+            }
             else if (baseRequest.RequestType == typeof(SIMCommon.Requests.Send))
             {
                 var request = JsonConvert.DeserializeObject<SIMCommon.Requests.Send>(decryptedRequest);

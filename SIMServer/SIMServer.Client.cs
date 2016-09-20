@@ -41,5 +41,10 @@
         {
             return ((int)(DateTime.Now - this.LeaseStart).TotalMilliseconds) > duration;
         }
+
+        public int RemainingLeaseTime(int duration)
+        {
+            return ((int)(DateTime.Now - this.LeaseStart).TotalMilliseconds);
+        }
     }
 }
