@@ -267,7 +267,7 @@
                     }
                 }
 
-                Thread.Sleep(100);
+                Thread.Sleep(SIMCommon.Constants.LeaseMonitorDelay);
             }
         }
     }

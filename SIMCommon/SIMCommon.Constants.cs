@@ -6,6 +6,7 @@
         public const int SIMServerPort = 13197;
         public const int SIMClientPort = 71913;
         public const int SIMClientMsgLoadLimit = 50;
+        public const int LeaseMonitorDelay = 100;
         public const string SIMClientDatabaseFilename = "MsgDB.db";
         public const string SIMClientDatabaseMessageTable = "SIMMESSAGES";
         public const string SIMClientDatabaseThreadTable = "SIMTHREADS";
