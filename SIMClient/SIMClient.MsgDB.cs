@@ -29,7 +29,7 @@
         {
             var result = new List<SIMCommon.Message>();
 
-            using (var cmd = new SQLiteCommand("SELECT  FROM @table WHERE threadID = @id ORDER BY timestamp DEC LIMIT @limit OFFSET @offset;", this.Connection))
+            using (var cmd = new SQLiteCommand("SELECT * FROM @table WHERE threadID = @id ORDER BY timestamp DEC LIMIT @limit OFFSET @offset;", this.Connection))
             {
                 cmd.Prepare();
                 cmd.Parameters.AddWithValue("@table", SIMCommon.Constants.SIMClientDatabaseMessageTable);
@@ -44,6 +44,21 @@
                         result.Add(new SIMCommon.Message(reader.GetInt32(0), reader.GetInt32(1), reader.GetString(2), reader.GetDateTime(3)));
                     }
                 }
+            }
+
+            return result;
+        }
+
+        public Thread GetThread(int id)
+        {
+            Thread result = null;
+            using (var cmd = new SQLiteCommand("SELECT * FROM @table WHERE ID = @id;", this.Connection))
+            {
+                cmd.Prepare();
+                cmd.Parameters.AddWithValue("@table", SIMCommon.Constants.SIMClientDatabaseThreadTable);
+                cmd.Parameters.AddWithValue("@id", id);
+
+                result = SDatabase.SQLite.Convert.DeserializeObject<Thread>(cmd);
             }
 
             return result;

@@ -76,6 +76,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SIMClient.MsgDB.cs" />
     <Compile Include="SIMClient.TcpClient.cs" />
+    <Compile Include="SIMClient.Thread.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
