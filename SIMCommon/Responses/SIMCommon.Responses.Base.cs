@@ -6,9 +6,9 @@
     {
         public Base()
         {
-            this.RequestType = this.GetType();
+            this.ResponseType = this.GetType();
         }
 
-        public Type RequestType { get; private set; }
+        public Type ResponseType { get; private set; }
     }
 }
