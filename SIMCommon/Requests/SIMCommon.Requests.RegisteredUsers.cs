@@ -2,7 +2,7 @@
 {
     public sealed class RegisteredUsers : Base
     {
-        public RegisteredUsers() : base()
+        public RegisteredUsers() : base(true)
         {
         }
     }

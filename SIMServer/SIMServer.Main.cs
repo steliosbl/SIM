@@ -104,147 +104,154 @@
         {
             string response = null;
             var baseRequest = JsonConvert.DeserializeObject<SIMCommon.Requests.Base>(decryptedRequest);
-            if (baseRequest.RequestType == typeof(SIMCommon.Requests.Base))
+            if (baseRequest.LoggedInRequirement && this.Clients[address].User == null)
             {
                 response = SIMCommon.Constants.SIMServerInvalidRequestResponse;
             }
-            else if (baseRequest.RequestType == typeof(SIMCommon.Requests.Authenticate))
+            else
             {
-                var request = JsonConvert.DeserializeObject<SIMCommon.Requests.Authenticate>(decryptedRequest);
-                SIMCommon.Responses.Authenticate result;
-                if (this.Database.UserExists(request.Username))
-                {
-                    result = new SIMCommon.Responses.Authenticate(this.Database.GetUser(this.Database.GetUserID(request.Username)).Authenticate(request.Password));
-                }
-                else
-                {
-                    result = new SIMCommon.Responses.Authenticate(false);
-                }
-
-                response = JsonConvert.SerializeObject(result);
-            }
-            else if (baseRequest.RequestType == typeof(SIMCommon.Requests.EndCommunication))
-            {
-                this.Clients.Remove(address);
-                var result = new SIMCommon.Responses.EndCommunication();
-                response = JsonConvert.SerializeObject(result);
-            }
-            else if (baseRequest.RequestType == typeof(SIMCommon.Requests.Get))
-            {
-                if (this.Clients[address].User != null)
-                {
-                    var messages = this.Backlog.Messages[this.Clients[address].User.ID];
-                    var result = new SIMCommon.Responses.Get(messages);
-                    response = JsonConvert.SerializeObject(result);
-                }
-                else
-                {
-                    response = JsonConvert.SerializeObject(new SIMCommon.Responses.Get(null));
-                }
-            }
-            else if (baseRequest.RequestType == typeof(SIMCommon.Requests.Register))
-            {
-                var request = JsonConvert.DeserializeObject<SIMCommon.Requests.Register>(decryptedRequest);
-                if (!this.Database.UserExists(request.Username))
-                {
-                    var newUser = new User(this.Database.GetLastUserID() + 1, request.Username, request.Password);
-                    this.Database.AddUser(newUser);
-                }
-            }
-            else if (baseRequest.RequestType == typeof(SIMCommon.Requests.RegisteredUsers))
-            {
-                var profs = new Dictionary<int, SIMCommon.UserProfile>();
-                foreach (var client in this.Clients.Values.ToList().FindAll(client => client.User != null))
-                {
-                    profs.Add(client.User.ID, new SIMCommon.UserProfile(client.User.ID, client.User.Nickname, true));
-                }
-
-                var allProfiles = this.Database.GetProfiles();
-                foreach (var profile in allProfiles.FindAll(profile => !profs.ContainsKey(profile.ID)))
-                {
-                    profs.Add(profile.ID, profile);
-                }
-
-                var result = new SIMCommon.Responses.RegisteredUsers(profs.Values.ToList());
-                response = JsonConvert.SerializeObject(result);
-            }
-            else if (baseRequest.RequestType == typeof(SIMCommon.Requests.Renew))
-            {
-                if (this.Clients[address].RemainingLeaseTime(this.Config.LeaseDuration) <= SIMCommon.Constants.LeaseMonitorDelay)
-                {
-                    this.Clients[address].RenewLease();
-                    response = JsonConvert.SerializeObject(new SIMCommon.Responses.Renew());
-                }
-                else
+                if (baseRequest.RequestType == typeof(SIMCommon.Requests.Base))
                 {
                     response = SIMCommon.Constants.SIMServerInvalidRequestResponse;
                 }
-            }
-            else if (baseRequest.RequestType == typeof(SIMCommon.Requests.Send))
-            {
-                var request = JsonConvert.DeserializeObject<SIMCommon.Requests.Send>(decryptedRequest);
-                SIMCommon.Responses.Send result;
-                if (this.Database.UserExists(request.Message.RecipientID))
+                else if (baseRequest.RequestType == typeof(SIMCommon.Requests.Authenticate))
                 {
-                    this.Backlog.Messages[request.Message.RecipientID].Add(request.Message);
-                    result = new SIMCommon.Responses.Send(true);
-                }
-                else
-                {
-                    result = new SIMCommon.Responses.Send(false);
-                }
-
-                response = JsonConvert.SerializeObject(result);
-            }
-            else if (baseRequest.RequestType == typeof(SIMCommon.Requests.SignIn))
-            {
-                var request = JsonConvert.DeserializeObject<SIMCommon.Requests.SignIn>(decryptedRequest);
-                SIMCommon.Responses.SignIn result;
-                if (this.Database.UserExists(request.Username))
-                {
-                    var user = this.Database.GetUser(this.Database.GetUserID(request.Username));
-                    if (user.Authenticate(request.Password))
+                    var request = JsonConvert.DeserializeObject<SIMCommon.Requests.Authenticate>(decryptedRequest);
+                    SIMCommon.Responses.Authenticate result;
+                    if (this.Database.UserExists(request.Username))
                     {
-                        this.Clients[address].LoadUser(user);
-                        result = new SIMCommon.Responses.SignIn(true);
+                        result = new SIMCommon.Responses.Authenticate(this.Database.GetUser(this.Database.GetUserID(request.Username)).Authenticate(request.Password));
+                    }
+                    else
+                    {
+                        result = new SIMCommon.Responses.Authenticate(false);
+                    }
+
+                    response = JsonConvert.SerializeObject(result);
+                }
+                else if (baseRequest.RequestType == typeof(SIMCommon.Requests.EndCommunication))
+                {
+                    this.Clients.Remove(address);
+                    var result = new SIMCommon.Responses.EndCommunication();
+                    response = JsonConvert.SerializeObject(result);
+                }
+                else if (baseRequest.RequestType == typeof(SIMCommon.Requests.Get))
+                {
+                    if (this.Clients[address].User != null)
+                    {
+                        var messages = this.Backlog.Messages[this.Clients[address].User.ID];
+                        var result = new SIMCommon.Responses.Get(messages);
+                        response = JsonConvert.SerializeObject(result);
+                    }
+                    else
+                    {
+                        response = JsonConvert.SerializeObject(new SIMCommon.Responses.Get(null));
+                    }
+                }
+                else if (baseRequest.RequestType == typeof(SIMCommon.Requests.Register))
+                {
+                    var request = JsonConvert.DeserializeObject<SIMCommon.Requests.Register>(decryptedRequest);
+                    if (!this.Database.UserExists(request.Username))
+                    {
+                        var newUser = new User(this.Database.GetLastUserID() + 1, request.Username, request.Password);
+                        this.Database.AddUser(newUser);
+                    }
+                }
+                else if (baseRequest.RequestType == typeof(SIMCommon.Requests.RegisteredUsers))
+                {
+                    var profs = new Dictionary<int, SIMCommon.UserProfile>();
+                    foreach (var client in this.Clients.Values.ToList().FindAll(client => client.User != null))
+                    {
+                        profs.Add(client.User.ID, new SIMCommon.UserProfile(client.User.ID, client.User.Nickname, true));
+                    }
+
+                    var allProfiles = this.Database.GetProfiles();
+                    foreach (var profile in allProfiles.FindAll(profile => !profs.ContainsKey(profile.ID)))
+                    {
+                        profs.Add(profile.ID, profile);
+                    }
+
+                    var result = new SIMCommon.Responses.RegisteredUsers(profs.Values.ToList());
+                    response = JsonConvert.SerializeObject(result);
+                }
+                else if (baseRequest.RequestType == typeof(SIMCommon.Requests.Renew))
+                {
+                    if (this.Clients[address].RemainingLeaseTime(this.Config.LeaseDuration) <= SIMCommon.Constants.LeaseMonitorDelay)
+                    {
+                        this.Clients[address].RenewLease();
+                        response = JsonConvert.SerializeObject(new SIMCommon.Responses.Renew());
+                    }
+                    else
+                    {
+                        response = SIMCommon.Constants.SIMServerInvalidRequestResponse;
+                    }
+                }
+                else if (baseRequest.RequestType == typeof(SIMCommon.Requests.Send))
+                {
+                    var request = JsonConvert.DeserializeObject<SIMCommon.Requests.Send>(decryptedRequest);
+                    SIMCommon.Responses.Send result;
+                    if (this.Database.UserExists(request.Message.RecipientID))
+                    {
+                        this.Backlog.Messages[request.Message.RecipientID].Add(request.Message);
+                        result = new SIMCommon.Responses.Send(true);
+                    }
+                    else
+                    {
+                        result = new SIMCommon.Responses.Send(false);
+                    }
+
+                    response = JsonConvert.SerializeObject(result);
+                }
+                else if (baseRequest.RequestType == typeof(SIMCommon.Requests.SignIn))
+                {
+                    var request = JsonConvert.DeserializeObject<SIMCommon.Requests.SignIn>(decryptedRequest);
+                    SIMCommon.Responses.SignIn result;
+                    if (this.Database.UserExists(request.Username))
+                    {
+                        var user = this.Database.GetUser(this.Database.GetUserID(request.Username));
+                        if (user.Authenticate(request.Password))
+                        {
+                            this.Clients[address].LoadUser(user);
+                            result = new SIMCommon.Responses.SignIn(true);
+                        }
+                        else
+                        {
+                            result = new SIMCommon.Responses.SignIn(false);
+                        }
                     }
                     else
                     {
                         result = new SIMCommon.Responses.SignIn(false);
                     }
+
+                    response = JsonConvert.SerializeObject(result);
+                }
+                else if (baseRequest.RequestType == typeof(SIMCommon.Requests.SignOut))
+                {
+                    this.Clients[address].RemoveUser();
+                    var result = new SIMCommon.Responses.SignOut();
+                    response = JsonConvert.SerializeObject(result);
+                }
+                else if (baseRequest.RequestType == typeof(SIMCommon.Requests.UserRef))
+                {
+                    var request = JsonConvert.DeserializeObject<SIMCommon.Requests.UserRef>(decryptedRequest);
+                    SIMCommon.Responses.UserRef result;
+                    if (this.Database.UserExists(request.ID))
+                    {
+                        var user = this.Database.GetUser(request.ID);
+                        result = new SIMCommon.Responses.UserRef(user.Nickname);
+                    }
+                    else
+                    {
+                        result = new SIMCommon.Responses.UserRef(null);
+                    }
+
+                    response = JsonConvert.SerializeObject(result);
                 }
                 else
                 {
-                    result = new SIMCommon.Responses.SignIn(false);
+                    response = SIMCommon.Constants.SIMServerInvalidRequestResponse;
                 }
-
-                response = JsonConvert.SerializeObject(result);
-            }
-            else if (baseRequest.RequestType == typeof(SIMCommon.Requests.SignOut))
-            {
-                this.Clients[address].RemoveUser();
-                var result = new SIMCommon.Responses.SignOut();
-                response = JsonConvert.SerializeObject(result);
-            }
-            else if (baseRequest.RequestType == typeof(SIMCommon.Requests.UserRef))
-            {
-                var request = JsonConvert.DeserializeObject<SIMCommon.Requests.UserRef>(decryptedRequest);
-                SIMCommon.Responses.UserRef result;
-                if (this.Database.UserExists(request.ID))
-                {
-                    var user = this.Database.GetUser(request.ID);
-                    result = new SIMCommon.Responses.UserRef(user.Nickname);
-                }
-                else
-                {
-                    result = new SIMCommon.Responses.UserRef(null);
-                }
-
-                response = JsonConvert.SerializeObject(result);
-            }
-            else
-            {
-                response = SIMCommon.Constants.SIMServerInvalidRequestResponse;
             }
 
             return response;

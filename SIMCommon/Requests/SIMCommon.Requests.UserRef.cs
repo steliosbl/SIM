@@ -4,7 +4,7 @@
 
     public sealed class UserRef : Base
     {
-        public UserRef(int id) : base()
+        public UserRef(int id) : base(true)
         {
             this.ID = id;
         }

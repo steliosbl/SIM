@@ -2,7 +2,7 @@
 {
     public sealed class BeginCommunication : Base
     {
-        public BeginCommunication(string publicKey) : base()
+        public BeginCommunication(string publicKey) : base(false)
         {
             this.PublicKey = publicKey;
         }

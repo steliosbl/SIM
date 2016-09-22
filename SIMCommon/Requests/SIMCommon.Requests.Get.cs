@@ -2,7 +2,7 @@
 {
     public sealed class Get : Base
     {
-        public Get() : base()
+        public Get() : base(true)
         {
         }
     }

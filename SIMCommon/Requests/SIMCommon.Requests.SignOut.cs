@@ -2,7 +2,7 @@
 {
     public sealed class SignOut : Base
     {
-        public SignOut() : base()
+        public SignOut() : base(true)
         {
         }
     }

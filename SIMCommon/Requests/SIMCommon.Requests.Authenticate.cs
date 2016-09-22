@@ -2,7 +2,7 @@
 {
     public class Authenticate : Base
     {
-        public Authenticate(string username, string password) : base()
+        public Authenticate(string username, string password) : base(false)
         {
             this.Username = username;
             this.Password = password;

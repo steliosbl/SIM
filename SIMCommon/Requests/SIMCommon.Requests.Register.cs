@@ -2,7 +2,7 @@
 {
     public sealed class Register : Base
     {
-        public Register(string username, string password) : base()
+        public Register(string username, string password) : base(false)
         {
             this.Username = username;
             this.Password = password;

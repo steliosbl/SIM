@@ -2,7 +2,7 @@
 {
     public sealed class Encrypted : Base
     {
-        public Encrypted(byte[] encryptedSessionKey, string encryptedRequest) : base()
+        public Encrypted(byte[] encryptedSessionKey, string encryptedRequest) : base(false)
         {
             this.EncryptedSessionKey = encryptedSessionKey;
             this.EncryptedRequest = encryptedRequest;

@@ -2,7 +2,7 @@
 {
     public sealed class EndCommunication : Base
     {
-        public EndCommunication() : base()
+        public EndCommunication() : base(false)
         {
         }
     }
