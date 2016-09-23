@@ -18,7 +18,6 @@
             this.PGPClient = new SCrypto.PGP.SPGP();
 
             this.LeaseMonitor = new System.Threading.Thread(() => this.RunLeaseMonitor());
-            this.LeaseMonitor.Start();
         }
 
         public IPAddress Address { get; private set; }
@@ -39,6 +38,7 @@
         {
             var request = new SIMCommon.Requests.EndConnection();
             this.SendEncryptedRequest(request);
+            this.LeaseMonitor.Abort();
         }
 
         public List<SIMCommon.Message> Get()
@@ -71,6 +71,7 @@
                     var convertedResponse = JsonConvert.DeserializeObject<SIMCommon.Responses.InitConnection>(response);
                     this.ServerPublicKey = convertedResponse.PublicKey;
                     this.LeaseDuration = convertedResponse.LeaseDuration;
+                    this.LeaseMonitor.Start();
                     return true;
                 }
 
