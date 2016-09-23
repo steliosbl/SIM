@@ -35,16 +35,40 @@
 
         public List<SIMCommon.UserProfile> Profiles { get; private set; }
 
-        public bool InitializeConnection()
+        public void EndConnection()
+        {
+            var request = new SIMCommon.Requests.EndConnection();
+            this.SendEncryptedRequest(request);
+        }
+
+        public List<SIMCommon.Message> Get()
         {
             try
             {
-                var request = new SIMCommon.Requests.BeginCommunication(this.PGPClient.PublicKey);
+                var response = JsonConvert.DeserializeObject<SIMCommon.Responses.Get>(this.SendEncryptedRequest(new SIMCommon.Requests.Get()));
+                return response.Messages;
+            }
+            catch (InvalidResponseException)
+            {
+                return null;
+            }
+        }
+
+        public void GetProfiles()
+        {
+            this.Profiles = JsonConvert.DeserializeObject<SIMCommon.Responses.GetProfiles>(this.SendEncryptedRequest(new SIMCommon.Requests.GetProfiles())).Users;
+        }
+
+        public bool InitConnection()
+        {
+            try
+            {
+                var request = new SIMCommon.Requests.InitConnection(this.PGPClient.PublicKey);
                 var response = TcpClient.Send(this.Address.ToString(), JsonConvert.SerializeObject(request));
                 var baseResponse = JsonConvert.DeserializeObject<SIMCommon.Responses.Base>(response);
-                if (baseResponse.ResponseType == typeof(SIMCommon.Responses.BeginCommunication))
+                if (baseResponse.ResponseType == typeof(SIMCommon.Responses.InitConnection))
                 {
-                    var convertedResponse = JsonConvert.DeserializeObject<SIMCommon.Responses.BeginCommunication>(response);
+                    var convertedResponse = JsonConvert.DeserializeObject<SIMCommon.Responses.InitConnection>(response);
                     this.ServerPublicKey = convertedResponse.PublicKey;
                     this.LeaseDuration = convertedResponse.LeaseDuration;
                     return true;
@@ -58,48 +82,32 @@
             }
         }
 
-        public void EndConnection()
+        public bool Register(string username, string password)
         {
-            var request = new SIMCommon.Requests.EndCommunication();
-            this.SendEncryptedRequest(request);
-        }
-
-        public string EncryptRequest(string serializedRequest)
-        {
-            if (!string.IsNullOrEmpty(this.ServerPublicKey))
+            var request = new SIMCommon.Requests.Register(username, password);
+            try
             {
-                string encrypted = this.PGPClient.Encrypt(serializedRequest, this.ServerPublicKey);
-                return encrypted;
+                var response = JsonConvert.DeserializeObject<SIMCommon.Responses.Register>(this.SendEncryptedRequest(request));
+                return response.Success;
             }
-            else
+            catch (InvalidResponseException)
             {
-                return null;
+                return false;
             }
         }
 
-        public string SendEncryptedRequest(SIMCommon.Requests.Base request)
+        public bool Send(SIMCommon.Message message)
         {
-            var encryptedRequest = this.EncryptRequest(JsonConvert.SerializeObject(request));
-            var encryptedResponse = JsonConvert.DeserializeObject<SIMCommon.Responses.Encrypted>(TcpClient.Send(this.Address.ToString(), encryptedRequest));
-            string decrypted = this.PGPClient.Decrypt(encryptedResponse.EncryptedResponse, encryptedResponse.EncryptedSessionKey);
-            if (decrypted == SIMCommon.Constants.SIMServerInvalidRequestResponse)
+            var request = new SIMCommon.Requests.Send(message);
+            try
             {
-                throw new InvalidResponseException();
+                var response = JsonConvert.DeserializeObject<SIMCommon.Responses.Send>(this.SendEncryptedRequest(request));
+                return response.Success;
             }
-
-            return decrypted;
-        }
-
-        public string SendRequest(SIMCommon.Requests.Base request)
-        {
-            string serialized = JsonConvert.SerializeObject(request);
-            string response = TcpClient.Send(this.Address.ToString(), serialized);
-            if (response == SIMCommon.Constants.SIMServerInvalidRequestResponse)
+            catch (InvalidResponseException)
             {
-                throw new InvalidResponseException();
+                return false;
             }
-
-            return response;
         }
 
         public bool SignIn(string username, string password)
@@ -124,9 +132,10 @@
             }
         }
 
-        public void GetProfiles()
+        public void SignOut()
         {
-            this.Profiles = JsonConvert.DeserializeObject<SIMCommon.Responses.RegisteredUsers>(this.SendEncryptedRequest(new SIMCommon.Requests.RegisteredUsers())).Users;
+            var request = new SIMCommon.Requests.SignOut();
+            this.SendEncryptedRequest(request);
         }
 
         private void RunLeaseMonitor()
@@ -147,6 +156,44 @@
 
                 System.Threading.Thread.Sleep(SIMCommon.Constants.LeaseMonitorDelay);
             }
+        }
+
+        private string EncryptRequest(string serializedRequest)
+        {
+            if (!string.IsNullOrEmpty(this.ServerPublicKey))
+            {
+                string encrypted = this.PGPClient.Encrypt(serializedRequest, this.ServerPublicKey);
+                return encrypted;
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        private string SendEncryptedRequest(SIMCommon.Requests.Base request)
+        {
+            var encryptedRequest = this.EncryptRequest(JsonConvert.SerializeObject(request));
+            var encryptedResponse = JsonConvert.DeserializeObject<SIMCommon.Responses.Encrypted>(TcpClient.Send(this.Address.ToString(), encryptedRequest));
+            string decrypted = this.PGPClient.Decrypt(encryptedResponse.EncryptedResponse, encryptedResponse.EncryptedSessionKey);
+            if (decrypted == SIMCommon.Constants.SIMServerInvalidRequestResponse)
+            {
+                throw new InvalidResponseException();
+            }
+
+            return decrypted;
+        }
+
+        private string SendRequest(SIMCommon.Requests.Base request)
+        {
+            string serialized = JsonConvert.SerializeObject(request);
+            string response = TcpClient.Send(this.Address.ToString(), serialized);
+            if (response == SIMCommon.Constants.SIMServerInvalidRequestResponse)
+            {
+                throw new InvalidResponseException();
+            }
+
+            return response;
         }
 
         public class InvalidResponseException : Exception

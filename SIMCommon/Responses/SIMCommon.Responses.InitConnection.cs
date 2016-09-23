@@ -1,8 +1,8 @@
 ﻿namespace SIMCommon.Responses
 {
-    public sealed class BeginCommunication : Base
+    public sealed class InitConnection : Base
     {
-        public BeginCommunication(string publicKey, int leaseDuration) : base()
+        public InitConnection(string publicKey, int leaseDuration) : base()
         {
             this.PublicKey = publicKey;
             this.LeaseDuration = leaseDuration;

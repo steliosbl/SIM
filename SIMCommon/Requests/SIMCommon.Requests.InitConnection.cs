@@ -1,8 +1,8 @@
 ﻿namespace SIMCommon.Requests
 {
-    public sealed class BeginCommunication : Base
+    public sealed class InitConnection : Base
     {
-        public BeginCommunication(string publicKey) : base(false)
+        public InitConnection(string publicKey) : base(false)
         {
             this.PublicKey = publicKey;
         }

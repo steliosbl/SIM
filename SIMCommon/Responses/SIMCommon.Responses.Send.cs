@@ -2,11 +2,11 @@
 {
     public sealed class Send : Base
     {
-        public Send(bool result) : base()
+        public Send(bool success) : base()
         {
-            this.Result = result;
+            this.Success = success;
         }
 
-        public bool Result { get; private set; }
+        public bool Success { get; private set; }
     }
 }

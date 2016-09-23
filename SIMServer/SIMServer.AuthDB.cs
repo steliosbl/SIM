@@ -26,7 +26,7 @@
             using (var cmd = new MySqlCommand("SELECT MAX (ID) FROM @table;", this.Connection))
             {
                 cmd.Prepare();
-                cmd.Parameters.AddWithValue("@table", SIMCommon.Constants.SIMServerAuthDBUserTable);
+                cmd.Parameters.AddWithValue("@table", SIMCommon.Constants.SIMServerAuthDatabaseUserTable);
                 try
                 {
                     return System.Convert.ToInt32(cmd.ExecuteScalar());
@@ -46,7 +46,7 @@
                 using (var cmd = new MySqlCommand("SELECT * FROM @table WHERE Username = @username;", this.Connection))
                 {
                     cmd.Prepare();
-                    cmd.Parameters.AddWithValue("@table", SIMCommon.Constants.SIMServerAuthDBUserTable);
+                    cmd.Parameters.AddWithValue("@table", SIMCommon.Constants.SIMServerAuthDatabaseUserTable);
                     cmd.Parameters.AddWithValue("@username", username);
                     using (var rdr = cmd.ExecuteReader())
                     {
@@ -67,7 +67,7 @@
                 using (var cmd = new MySqlCommand("SELECT * FROM @table WHERE ID = @id;", this.Connection))
                 {
                     cmd.Prepare();
-                    cmd.Parameters.AddWithValue("@table", SIMCommon.Constants.SIMServerAuthDBUserTable);
+                    cmd.Parameters.AddWithValue("@table", SIMCommon.Constants.SIMServerAuthDatabaseUserTable);
                     cmd.Parameters.AddWithValue("@id", id);
                     using (var rdr = cmd.ExecuteReader())
                     {
@@ -86,7 +86,7 @@
             using (var cmd = new MySqlCommand("SELECT EXISTS(SELECT * FROM @table WHERE ID = @id LIMIT 1);", this.Connection))
             {
                 cmd.Prepare();
-                cmd.Parameters.AddWithValue("@table", SIMCommon.Constants.SIMServerAuthDBUserTable);
+                cmd.Parameters.AddWithValue("@table", SIMCommon.Constants.SIMServerAuthDatabaseUserTable);
                 cmd.Parameters.AddWithValue("@id", id);
                 return System.Convert.ToBoolean(cmd.ExecuteScalar());
             }
@@ -97,7 +97,7 @@
             using (var cmd = new MySqlCommand("SELECT EXISTS(SELECT * FROM @table WHERE Username = @username LIMIT 1);", this.Connection))
             {
                 cmd.Prepare();
-                cmd.Parameters.AddWithValue("@table", SIMCommon.Constants.SIMServerAuthDBUserTable);
+                cmd.Parameters.AddWithValue("@table", SIMCommon.Constants.SIMServerAuthDatabaseUserTable);
                 cmd.Parameters.AddWithValue("@username", username);
                 return System.Convert.ToBoolean(cmd.ExecuteScalar());
             }
@@ -110,7 +110,7 @@
                 using (var cmd = new MySqlCommand("SELECT * FROM @table WHERE ID = @id;", this.Connection))
                 {
                     cmd.Prepare();
-                    cmd.Parameters.AddWithValue("@table", SIMCommon.Constants.SIMServerAuthDBUserTable);
+                    cmd.Parameters.AddWithValue("@table", SIMCommon.Constants.SIMServerAuthDatabaseUserTable);
                     cmd.Parameters.AddWithValue("@id", id);
                     return SDatabase.MySQL.Convert.DeserializeObject<User>(cmd);
                 }
@@ -127,7 +127,7 @@
             using (var cmd = new MySqlCommand("SELECT ID, Nickname FROM @table;", this.Connection))
             {
                 cmd.Prepare();
-                cmd.Parameters.AddWithValue("@table", SIMCommon.Constants.SIMServerAuthDBUserTable);
+                cmd.Parameters.AddWithValue("@table", SIMCommon.Constants.SIMServerAuthDatabaseUserTable);
                 using (var reader = cmd.ExecuteReader())
                 {
                     while (reader.Read())
@@ -142,7 +142,7 @@
 
         public void AddUser(User user)
         {
-            SDatabase.MySQL.Convert.SerializeObject(this.Connection, user, SIMCommon.Constants.SIMServerAuthDBUserTable);
+            SDatabase.MySQL.Convert.SerializeObject(this.Connection, user, SIMCommon.Constants.SIMServerAuthDatabaseUserTable);
         }
     }
 }

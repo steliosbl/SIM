@@ -78,13 +78,13 @@
         {
             string response;
             var baseRequest = JsonConvert.DeserializeObject<SIMCommon.Requests.Base>(data);
-            if (baseRequest.RequestType == typeof(SIMCommon.Requests.BeginCommunication))
+            if (baseRequest.RequestType == typeof(SIMCommon.Requests.InitConnection))
             {
                 if (!this.Clients.Keys.Contains(address))
                 {
-                    var request = JsonConvert.DeserializeObject<SIMCommon.Requests.BeginCommunication>(data);
+                    var request = JsonConvert.DeserializeObject<SIMCommon.Requests.InitConnection>(data);
                     this.Clients.Add(address, new Client(address, request.PublicKey));
-                    var result = new SIMCommon.Responses.BeginCommunication(this.Clients[address].PGPClient.PublicKey, this.Config.LeaseDuration);
+                    var result = new SIMCommon.Responses.InitConnection(this.Clients[address].PGPClient.PublicKey, this.Config.LeaseDuration);
                     response = JsonConvert.SerializeObject(result);
                 }
                 else
@@ -129,10 +129,10 @@
 
                     response = JsonConvert.SerializeObject(result);
                 }
-                else if (baseRequest.RequestType == typeof(SIMCommon.Requests.EndCommunication))
+                else if (baseRequest.RequestType == typeof(SIMCommon.Requests.EndConnection))
                 {
                     this.Clients.Remove(address);
-                    var result = new SIMCommon.Responses.EndCommunication();
+                    var result = new SIMCommon.Responses.EndConnection();
                     response = JsonConvert.SerializeObject(result);
                 }
                 else if (baseRequest.RequestType == typeof(SIMCommon.Requests.Get))
@@ -148,16 +148,7 @@
                         response = JsonConvert.SerializeObject(new SIMCommon.Responses.Get(null));
                     }
                 }
-                else if (baseRequest.RequestType == typeof(SIMCommon.Requests.Register))
-                {
-                    var request = JsonConvert.DeserializeObject<SIMCommon.Requests.Register>(decryptedRequest);
-                    if (!this.Database.UserExists(request.Username))
-                    {
-                        var newUser = new User(this.Database.GetLastUserID() + 1, request.Username, request.Password);
-                        this.Database.AddUser(newUser);
-                    }
-                }
-                else if (baseRequest.RequestType == typeof(SIMCommon.Requests.RegisteredUsers))
+                else if (baseRequest.RequestType == typeof(SIMCommon.Requests.GetProfiles))
                 {
                     var profs = new Dictionary<int, SIMCommon.UserProfile>();
                     foreach (var client in this.Clients.Values.ToList().FindAll(client => client.User != null))
@@ -171,8 +162,17 @@
                         profs.Add(profile.ID, profile);
                     }
 
-                    var result = new SIMCommon.Responses.RegisteredUsers(profs.Values.ToList());
+                    var result = new SIMCommon.Responses.GetProfiles(profs.Values.ToList());
                     response = JsonConvert.SerializeObject(result);
+                }
+                else if (baseRequest.RequestType == typeof(SIMCommon.Requests.Register))
+                {
+                    var request = JsonConvert.DeserializeObject<SIMCommon.Requests.Register>(decryptedRequest);
+                    if (!this.Database.UserExists(request.Username))
+                    {
+                        var newUser = new User(this.Database.GetLastUserID() + 1, request.Username, request.Password);
+                        this.Database.AddUser(newUser);
+                    }
                 }
                 else if (baseRequest.RequestType == typeof(SIMCommon.Requests.Renew))
                 {

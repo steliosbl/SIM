@@ -10,7 +10,7 @@
         public const string SIMClientDatabaseFilename = "MsgDB.db";
         public const string SIMClientDatabaseMessageTable = "SIMMESSAGES";
         public const string SIMClientDatabaseThreadTable = "SIMTHREADS";
-        public const string SIMServerAuthDBUserTable = "SIMUSERS";
+        public const string SIMServerAuthDatabaseUserTable = "SIMUSERS";
         public const string SIMServerConfigFilename = "SIMServer.cfg";
         public const string SIMServerInvalidRequestResponse = "NULL";
         public const string SIMServerBacklogFilename = "SIMServer.backlog.json";
