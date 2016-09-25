@@ -236,14 +236,14 @@
                 {
                     var request = JsonConvert.DeserializeObject<SIMCommon.Requests.UserRef>(decryptedRequest);
                     SIMCommon.Responses.UserRef result;
-                    if (this.Database.UserExists(request.Username))
+                    if (this.Database.UserExists(request.ID))
                     {
-                        var user = this.Database.GetUser(this.Database.GetUserID(request.Username));
-                        result = new SIMCommon.Responses.UserRef(user.ID);
+                        var user = this.Database.GetUser(request.ID);
+                        result = new SIMCommon.Responses.UserRef(user.Nickname);
                     }
                     else
                     {
-                        result = new SIMCommon.Responses.UserRef(0);
+                        result = new SIMCommon.Responses.UserRef(null);
                     }
 
                     response = JsonConvert.SerializeObject(result);
