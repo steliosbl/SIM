@@ -8,7 +8,7 @@
     using Newtonsoft.Json;
     using SCrypto;
 
-    public class Server
+    public class Server : IDisposable
     {
         public Server(IPAddress address)
         {
@@ -151,6 +151,13 @@
             {
                 return null;
             }
+        }
+
+        public void Dispose()
+        {
+            var request = new SIMCommon.Requests.EndConnection();
+            this.SendEncryptedRequest(request);
+            this.LeaseMonitor.Abort();
         }
 
         private void RunLeaseMonitor()
