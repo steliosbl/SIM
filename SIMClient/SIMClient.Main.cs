@@ -7,7 +7,7 @@
     using System.Text;
     using System.Threading.Tasks;
 
-    public class Main
+    public class Main : IDisposable
     {
         public Main(IPAddress address)
         {
@@ -15,7 +15,7 @@
             this.CurrentUser = null;
             this.CurrentThread = null;
             this.Server = new SIMClient.Server(address);
-            this.GetClock = new System.Threading.Thread(() => this.GetClock());
+            this.GetClock = new System.Threading.Thread(() => this.GetMessages());
             this.GetClock.Start();
         }
 
@@ -42,10 +42,17 @@
             if (this.Server.SignIn(username, password))
             {
                 this.CurrentUser = this.Server.UserRef(username);
+                this.Server.GetProfiles();
                 return true;
             }
 
             return false;
+        }
+
+        public void SignOut()
+        {
+            this.Server.SignOut();
+            this.CurrentUser = null;
         }
 
         public bool Send(string message, int recipient)
@@ -69,13 +76,37 @@
             return false;
         }
 
+        public void ReloadThread()
+        {
+            this.LoadThread(this.CurrentThread.ID);
+        }
+
+        public void Dispose()
+        {
+            this.GetClock.Abort();
+            this.Server.Dispose();
+        }
+
         private void GetMessages()
         {
             while (true)
             {
+                var threadIDs = new List<int>();
                 foreach (SIMCommon.Message message in this.Server.Get())
                 {
                     this.Database.WriteMessage(message);
+                    if (!threadIDs.Contains(message.ThreadID))
+                    {
+                        threadIDs.Add(message.ThreadID);
+                    }
+                }
+
+                if (this.CurrentThread != null)
+                {
+                    if (threadIDs.Contains(this.CurrentThread.ID))
+                    {
+                        this.ReloadThread();
+                    }
                 }
 
                 System.Threading.Thread.Sleep(SIMCommon.Constants.GetClockDelay);
