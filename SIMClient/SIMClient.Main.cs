@@ -13,7 +13,10 @@
         {
             this.Database = new SIMClient.MsgDB();
             this.CurrentUser = null;
+            this.CurrentThread = null;
             this.Server = new SIMClient.Server(address);
+            this.GetClock = new System.Threading.Thread(() => this.GetClock());
+            this.GetClock.Start();
         }
 
         public Server Server { get; private set; }
@@ -21,6 +24,10 @@
         public MsgDB Database { get; private set; }
 
         public SIMCommon.UserProfile CurrentUser { get; private set; }
+
+        public Thread CurrentThread { get; private set; }
+
+        public System.Threading.Thread GetClock { get; private set; }
 
         public bool LoggedIn
         {
@@ -50,6 +57,29 @@
             }
 
             return false;
+        }
+
+        public bool LoadThread(int id)
+        {
+            if (this.Database.ThreadExists(id))
+            {
+                this.CurrentThread = this.Database.GetThread(id);
+            }
+
+            return false;
+        }
+
+        private void GetMessages()
+        {
+            while (true)
+            {
+                foreach (SIMCommon.Message message in this.Server.Get())
+                {
+                    this.Database.WriteMessage(message);
+                }
+
+                System.Threading.Thread.Sleep(SIMCommon.Constants.GetClockDelay);
+            }
         }
     }
 }
