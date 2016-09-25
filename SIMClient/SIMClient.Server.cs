@@ -139,6 +139,20 @@
             this.SendEncryptedRequest(request);
         }
 
+        public SIMCommon.UserProfile UserRef(string username)
+        {
+            try
+            {
+                var request = new SIMCommon.Requests.UserRef(username);
+                var response = JsonConvert.DeserializeObject<SIMCommon.Responses.UserRef>(this.SendEncryptedRequest(request));
+                return response.Profile;
+            }
+            catch (InvalidResponseException)
+            {
+                return null;
+            }
+        }
+
         private void RunLeaseMonitor()
         {
             while (true)
