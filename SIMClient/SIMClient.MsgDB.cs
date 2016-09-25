@@ -49,16 +49,30 @@
             return result;
         }
 
-        public Thread GetThread(int id)
+        public bool ThreadExists(int id)
         {
-            Thread result = null;
-            using (var cmd = new SQLiteCommand("SELECT * FROM @table WHERE ID = @id;", this.Connection))
+            using (var cmd = new SQLiteCommand("SELECT EXISTS(SELECT * FROM @table WHERE ID = @id LIMIT 1);", this.Connection))
             {
                 cmd.Prepare();
                 cmd.Parameters.AddWithValue("@table", SIMCommon.Constants.SIMClientDatabaseThreadTable);
                 cmd.Parameters.AddWithValue("@id", id);
+                return System.Convert.ToBoolean(cmd.ExecuteScalar());
+            }
+        }
 
-                result = SDatabase.SQLite.Convert.DeserializeObject<Thread>(cmd);
+        public Thread GetThread(int id)
+        {
+            Thread result = null;
+            if (this.ThreadExists(id))
+            {
+                using (var cmd = new SQLiteCommand("SELECT * FROM @table WHERE ID = @id;", this.Connection))
+                {
+                    cmd.Prepare();
+                    cmd.Parameters.AddWithValue("@table", SIMCommon.Constants.SIMClientDatabaseThreadTable);
+                    cmd.Parameters.AddWithValue("@id", id);
+
+                    result = SDatabase.SQLite.Convert.DeserializeObject<Thread>(cmd);
+                }
             }
 
             return result;
