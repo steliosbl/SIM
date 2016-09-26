@@ -8,6 +8,7 @@
         public const int SIMClientMsgLoadLimit = 50;
         public const int LeaseMonitorDelay = 100;
         public const int GetClockDelay = 100;
+        public const int SIMClientGetClockStartDelay = 1000;
         public const string SIMClientDatabaseFilename = "MsgDB.db";
         public const string SIMClientDatabaseMessageTable = "SIMMESSAGES";
         public const string SIMClientDatabaseThreadTable = "SIMTHREADS";

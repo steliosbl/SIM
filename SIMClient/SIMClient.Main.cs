@@ -16,7 +16,14 @@
             this.CurrentThread = null;
             this.Server = new SIMClient.Server(address);
             this.GetClock = new System.Threading.Thread(() => this.GetMessages());
-            this.GetClock.Start();
+            if (this.Server.InitConnection())
+            {
+                this.GetClock.Start();
+            }
+            else
+            {
+                throw new InitializationFailiureException();
+            }
         }
 
         public Server Server { get; private set; }
@@ -110,6 +117,13 @@
                 }
 
                 System.Threading.Thread.Sleep(SIMCommon.Constants.GetClockDelay);
+            }
+        }
+
+        public class InitializationFailiureException : Exception
+        {
+            public InitializationFailiureException()
+            {
             }
         }
     }
