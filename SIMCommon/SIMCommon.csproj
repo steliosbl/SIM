@@ -49,12 +49,14 @@
   <ItemGroup>
     <Compile Include="Requests\SIMCommon.Requests.Encrypted.cs" />
     <Compile Include="Requests\SIMCommon.Requests.Get.cs" />
+    <Compile Include="Requests\SIMCommon.Requests.Ping.cs" />
     <Compile Include="Requests\SIMCommon.Requests.Register.cs" />
     <Compile Include="Requests\SIMCommon.Requests.GetProfiles.cs" />
     <Compile Include="Requests\SIMCommon.Requests.Renew.cs" />
     <Compile Include="Responses\SIMCommon.Responses.Encrypted.cs" />
     <Compile Include="Responses\SIMCommon.Responses.Get.cs" />
     <Compile Include="Responses\SIMCommon.Responses.NoLease.cs" />
+    <Compile Include="Responses\SIMCommon.Responses.Ping.cs" />
     <Compile Include="Responses\SIMCommon.Responses.Register.cs" />
     <Compile Include="Responses\SIMCommon.Responses.GetProfiles.cs" />
     <Compile Include="Responses\SIMCommon.Responses.Renew.cs" />

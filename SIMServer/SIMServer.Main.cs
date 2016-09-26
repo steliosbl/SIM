@@ -174,6 +174,10 @@
                         this.Database.AddUser(newUser);
                     }
                 }
+                else if (baseRequest.RequestType == typeof(SIMCommon.Requests.Ping))
+                {
+                    response = JsonConvert.SerializeObject(new SIMCommon.Responses.Ping(true));
+                }
                 else if (baseRequest.RequestType == typeof(SIMCommon.Requests.Renew))
                 {
                     if (this.Clients[address].RemainingLeaseTime(this.Config.LeaseDuration) <= SIMCommon.Constants.LeaseMonitorDelay)
