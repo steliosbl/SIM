@@ -77,5 +77,32 @@
 
             return result;
         }
+
+        public List<Thread> GetAllThreads()
+        {
+            var result = new List<Thread>();
+            using (var cmd = new SQLiteCommand("SELECT * from @table", this.Connection))
+            {
+                cmd.Prepare();
+                cmd.Parameters.AddWithValue("@table", SIMCommon.Constants.SIMClientDatabaseThreadTable);
+
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        using (var dcmd = new SQLiteCommand("SELECT * FROM @table WHERE ID = @id", this.Connection))
+                        {
+                            cmd.Prepare();
+                            cmd.Parameters.AddWithValue("@table", SIMCommon.Constants.SIMClientDatabaseThreadTable);
+                            cmd.Parameters.AddWithValue("@id", reader.GetInt32(0));
+
+                            result.Add(SDatabase.SQLite.Convert.DeserializeObject<Thread>(dcmd));
+                        }
+                    }
+                }
+            }
+
+            return result;
+        }
     }
 }
