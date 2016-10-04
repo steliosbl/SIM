@@ -116,7 +116,7 @@
                     }
                 }
 
-                System.Threading.Thread.Sleep(SIMCommon.Constants.GetClockDelay);
+                System.Threading.Thread.Sleep(SIMCommon.Constants.SIMClientGetClockDelay);
             }
         }
 
