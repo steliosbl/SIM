@@ -67,7 +67,13 @@
             if (this.LoggedIn)
             {
                 var msg = new SIMCommon.Message(this.CurrentUser.ID, recipient, message);
-                return this.Server.Send(msg);
+                if (this.Server.Send(msg))
+                {
+                    this.Database.WriteMessage(msg);
+                    return true;
+                }
+
+                return false;
             }
 
             return false;
