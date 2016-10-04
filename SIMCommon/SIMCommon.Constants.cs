@@ -2,16 +2,22 @@
 {
     public static class Constants
     {
+        // Common
         public const int TcpStreamByteSize = 512;
-        public const int SIMServerPort = 13197;
+        public const int LeaseMonitorDelay = 100;
+
+        // SIMClient
         public const int SIMClientPort = 71913;
         public const int SIMClientMsgLoadLimit = 50;
-        public const int LeaseMonitorDelay = 100;
-        public const int GetClockDelay = 100;
+        public const int SIMClientThreadOffset = 10;
+        public const int SIMClientGetClockDelay = 100;
         public const int SIMClientGetClockStartDelay = 1000;
         public const string SIMClientDatabaseFilename = "MsgDB.db";
         public const string SIMClientDatabaseMessageTable = "SIMMESSAGES";
         public const string SIMClientDatabaseThreadTable = "SIMTHREADS";
+
+        // SIMServer
+        public const int SIMServerPort = 13197;
         public const string SIMServerAuthDatabaseUserTable = "SIMUSERS";
         public const string SIMServerConfigFilename = "SIMServer.cfg";
         public const string SIMServerInvalidRequestResponse = "NULL";
