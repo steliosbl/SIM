@@ -16,11 +16,7 @@
             this.CurrentThread = null;
             this.Server = new SIMClient.Server(address);
             this.GetClock = new System.Threading.Thread(() => this.GetMessages());
-            if (this.Server.InitConnection())
-            {
-                this.GetClock.Start();
-            }
-            else
+            if (!this.Server.InitConnection())
             {
                 throw new InitializationFailiureException();
             }
@@ -50,6 +46,7 @@
             {
                 this.CurrentUser = this.Server.UserRef(username);
                 this.Server.GetProfiles();
+                this.GetClock.Start();
                 return true;
             }
 
