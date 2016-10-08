@@ -33,6 +33,8 @@
                 this.Backlog = backlogInterface.GetObject<Backlog>();
             }
 
+            this.Listener.Start();
+
             this.LeaseMonitor = new Thread(() => this.MonitorLeases());
             this.LeaseMonitor.Start();
         }
