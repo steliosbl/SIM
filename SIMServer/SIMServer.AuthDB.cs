@@ -23,10 +23,8 @@
 
         public int GetLastUserID()
         {
-            using (var cmd = new MySqlCommand("SELECT MAX (ID) FROM @table;", this.Connection))
+            using (var cmd = new MySqlCommand("SELECT MAX (ID) FROM " + SIMCommon.Constants.SIMServerAuthDatabaseUserTable + ";", this.Connection))
             {
-                cmd.Prepare();
-                cmd.Parameters.AddWithValue("@table", SIMCommon.Constants.SIMServerAuthDatabaseUserTable);
                 try
                 {
                     return System.Convert.ToInt32(cmd.ExecuteScalar());
@@ -43,10 +41,9 @@
         {
             if (this.UserExists(username))
             {
-                using (var cmd = new MySqlCommand("SELECT * FROM @table WHERE Username = @username;", this.Connection))
+                using (var cmd = new MySqlCommand("SELECT * FROM " + SIMCommon.Constants.SIMServerAuthDatabaseUserTable + " WHERE Username = @username;", this.Connection))
                 {
                     cmd.Prepare();
-                    cmd.Parameters.AddWithValue("@table", SIMCommon.Constants.SIMServerAuthDatabaseUserTable);
                     cmd.Parameters.AddWithValue("@username", username);
                     using (var rdr = cmd.ExecuteReader())
                     {
@@ -64,10 +61,9 @@
         {
             if (this.UserExists(id))
             {
-                using (var cmd = new MySqlCommand("SELECT * FROM @table WHERE ID = @id;", this.Connection))
+                using (var cmd = new MySqlCommand("SELECT * FROM " + SIMCommon.Constants.SIMServerAuthDatabaseUserTable + " WHERE ID = @id;", this.Connection))
                 {
                     cmd.Prepare();
-                    cmd.Parameters.AddWithValue("@table", SIMCommon.Constants.SIMServerAuthDatabaseUserTable);
                     cmd.Parameters.AddWithValue("@id", id);
                     using (var rdr = cmd.ExecuteReader())
                     {
@@ -83,10 +79,9 @@
 
         public bool UserExists(int id)
         {
-            using (var cmd = new MySqlCommand("SELECT EXISTS(SELECT * FROM @table WHERE ID = @id LIMIT 1);", this.Connection))
+            using (var cmd = new MySqlCommand("SELECT EXISTS(SELECT * FROM " + SIMCommon.Constants.SIMServerAuthDatabaseUserTable + " WHERE ID = @id LIMIT 1);", this.Connection))
             {
                 cmd.Prepare();
-                cmd.Parameters.AddWithValue("@table", SIMCommon.Constants.SIMServerAuthDatabaseUserTable);
                 cmd.Parameters.AddWithValue("@id", id);
                 return System.Convert.ToBoolean(cmd.ExecuteScalar());
             }
@@ -94,10 +89,9 @@
 
         public bool UserExists(string username)
         {
-            using (var cmd = new MySqlCommand("SELECT EXISTS(SELECT * FROM @table WHERE Username = @username LIMIT 1);", this.Connection))
+            using (var cmd = new MySqlCommand("SELECT EXISTS(SELECT * FROM " + SIMCommon.Constants.SIMServerAuthDatabaseUserTable + " WHERE Username = @username LIMIT 1);", this.Connection))
             {
                 cmd.Prepare();
-                cmd.Parameters.AddWithValue("@table", SIMCommon.Constants.SIMServerAuthDatabaseUserTable);
                 cmd.Parameters.AddWithValue("@username", username);
                 return System.Convert.ToBoolean(cmd.ExecuteScalar());
             }
@@ -107,10 +101,9 @@
         {
             if (this.UserExists(id))
             {
-                using (var cmd = new MySqlCommand("SELECT * FROM @table WHERE ID = @id;", this.Connection))
+                using (var cmd = new MySqlCommand("SELECT * FROM " + SIMCommon.Constants.SIMServerAuthDatabaseUserTable + " WHERE ID = @id;", this.Connection))
                 {
                     cmd.Prepare();
-                    cmd.Parameters.AddWithValue("@table", SIMCommon.Constants.SIMServerAuthDatabaseUserTable);
                     cmd.Parameters.AddWithValue("@id", id);
                     return SDatabase.MySQL.Convert.DeserializeObject<User>(cmd);
                 }
@@ -124,10 +117,8 @@
         public List<SIMCommon.UserProfile> GetProfiles()
         {
             var result = new List<SIMCommon.UserProfile>();
-            using (var cmd = new MySqlCommand("SELECT ID, Nickname FROM @table;", this.Connection))
+            using (var cmd = new MySqlCommand("SELECT ID, Nickname FROM " + SIMCommon.Constants.SIMServerAuthDatabaseUserTable + ";", this.Connection))
             {
-                cmd.Prepare();
-                cmd.Parameters.AddWithValue("@table", SIMCommon.Constants.SIMServerAuthDatabaseUserTable);
                 using (var reader = cmd.ExecuteReader())
                 {
                     while (reader.Read())

@@ -29,10 +29,9 @@
         {
             var result = new List<SIMCommon.Message>();
 
-            using (var cmd = new SQLiteCommand("SELECT * FROM @table WHERE threadID = @id ORDER BY timestamp DEC LIMIT @limit OFFSET @offset;", this.Connection))
+            using (var cmd = new SQLiteCommand("SELECT * FROM " + SIMCommon.Constants.SIMClientDatabaseMessageTable + " WHERE threadID = @id ORDER BY timestamp DEC LIMIT @limit OFFSET @offset;", this.Connection))
             {
                 cmd.Prepare();
-                cmd.Parameters.AddWithValue("@table", SIMCommon.Constants.SIMClientDatabaseMessageTable);
                 cmd.Parameters.AddWithValue("@id", threadID);
                 cmd.Parameters.AddWithValue("@limit", SIMCommon.Constants.SIMClientMsgLoadLimit);
                 cmd.Parameters.AddWithValue("@offset", offset);
@@ -51,10 +50,9 @@
 
         public bool ThreadExists(int id)
         {
-            using (var cmd = new SQLiteCommand("SELECT EXISTS(SELECT * FROM @table WHERE ID = @id LIMIT 1);", this.Connection))
+            using (var cmd = new SQLiteCommand("SELECT EXISTS(SELECT * FROM " + SIMCommon.Constants.SIMClientDatabaseMessageTable + " WHERE ID = @id LIMIT 1);", this.Connection))
             {
                 cmd.Prepare();
-                cmd.Parameters.AddWithValue("@table", SIMCommon.Constants.SIMClientDatabaseThreadTable);
                 cmd.Parameters.AddWithValue("@id", id);
                 return System.Convert.ToBoolean(cmd.ExecuteScalar());
             }
@@ -65,10 +63,9 @@
             Thread result = null;
             if (this.ThreadExists(id))
             {
-                using (var cmd = new SQLiteCommand("SELECT * FROM @table WHERE ID = @id;", this.Connection))
+                using (var cmd = new SQLiteCommand("SELECT * FROM " + SIMCommon.Constants.SIMClientDatabaseMessageTable + " WHERE ID = @id;", this.Connection))
                 {
                     cmd.Prepare();
-                    cmd.Parameters.AddWithValue("@table", SIMCommon.Constants.SIMClientDatabaseThreadTable);
                     cmd.Parameters.AddWithValue("@id", id);
 
                     result = SDatabase.SQLite.Convert.DeserializeObject<Thread>(cmd);
@@ -81,19 +78,15 @@
         public List<Thread> GetAllThreads()
         {
             var result = new List<Thread>();
-            using (var cmd = new SQLiteCommand("SELECT * from @table", this.Connection))
+            using (var cmd = new SQLiteCommand("SELECT * from " + SIMCommon.Constants.SIMClientDatabaseMessageTable + "", this.Connection))
             {
-                cmd.Prepare();
-                cmd.Parameters.AddWithValue("@table", SIMCommon.Constants.SIMClientDatabaseThreadTable);
-
                 using (var reader = cmd.ExecuteReader())
                 {
                     while (reader.Read())
                     {
-                        using (var dcmd = new SQLiteCommand("SELECT * FROM @table WHERE ID = @id", this.Connection))
+                        using (var dcmd = new SQLiteCommand("SELECT * FROM " + SIMCommon.Constants.SIMClientDatabaseMessageTable + " WHERE ID = @id", this.Connection))
                         {
                             cmd.Prepare();
-                            cmd.Parameters.AddWithValue("@table", SIMCommon.Constants.SIMClientDatabaseThreadTable);
                             cmd.Parameters.AddWithValue("@id", reader.GetInt32(0));
 
                             result.Add(SDatabase.SQLite.Convert.DeserializeObject<Thread>(dcmd));
