@@ -3,7 +3,7 @@
     public static class Constants
     {
         // Common
-        public const int TcpStreamByteSize = 512;
+        public const int TcpStreamByteSize = 1024;
         public const int LeaseMonitorDelay = 100;
 
         // SIMClient
@@ -22,6 +22,7 @@
         public const string SIMServerConfigFilename = "SIMServer.cfg";
         public const string SIMServerInvalidRequestResponse = "NULL";
         public const string SIMServerBacklogFilename = "SIMServer.backlog.json";
+        public const string SIMServerLoggerFilename = "SIMServer.log";
 
         public const string SIMServerLoggerDelimiter = "\n ---------------------------------- \n";
         public const string SIMServerLoggerSeverity0 = "[INFO] ";

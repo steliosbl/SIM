@@ -15,40 +15,20 @@
         private int port;
         private TcpListener server;
         private NetworkStream stream;
-        private List<IPAddress> clients;
 
-        public Listener(int port, ReceivedClientRequestHandler clientRequestHandler, ReceivedUnknownRequestHandler unknownRequesthandler, ReceivedDataHandler dataHandler = null)
+        public Listener(int port, ReceivedDataHandler dataHandler = null)
         {
             this.client = null;
             this.port = port;
             this.server = null;
             this.stream = null;
-            this.clients = new List<IPAddress>();
 
-            this.ReceivedClientRequest += clientRequestHandler;
-            this.ReceivedUnknownRequest += unknownRequesthandler;
-
-            if (dataHandler != null)
-            {
-                this.ReceivedData += dataHandler;
-            }
-            else
-            {
-                this.ReceivedData += this.ReceivedDataSifter;
-            }
+            this.ReceivedData += dataHandler;
         }
 
         public delegate void ReceivedDataHandler(EventArgs e, string data, IPAddress address);
 
-        public delegate void ReceivedClientRequestHandler(EventArgs e, string request, IPAddress address);
-
-        public delegate void ReceivedUnknownRequestHandler(EventArgs e, string request, IPAddress address);
-
         public event ReceivedDataHandler ReceivedData;
-
-        public event ReceivedClientRequestHandler ReceivedClientRequest;
-
-        public event ReceivedUnknownRequestHandler ReceivedUnknownRequest;
 
         public void Start()
         {
@@ -87,56 +67,11 @@
             this.stream.Write(msg, 0, msg.Length);
         }
 
-        public void UpdateClients(List<IPAddress> newClients)
-        {
-            this.clients = newClients;
-        }
-
         protected virtual void OnReceivedData(EventArgs e, string data, IPAddress address)
         {
             if (this.ReceivedData != null)
             {
                 this.ReceivedData(e, data, address);
-            }
-        }
-
-        protected virtual void OnReceivedClientRequest(EventArgs e, string request, IPAddress address)
-        {
-            if (this.ReceivedClientRequest != null)
-            {
-                this.ReceivedClientRequest(e, request, address);
-            }
-        }
-
-        protected virtual void OnReceivedUnknownRequest(EventArgs e, string request, IPAddress address)
-        {
-            if (this.ReceivedUnknownRequest != null)
-            {
-                this.ReceivedUnknownRequest(e, request, address);
-            }
-        }
-
-        private void ReceivedDataSifter(EventArgs e, string data, IPAddress address)
-        {
-            try
-            {
-                JsonSerializerSettings settings = new JsonSerializerSettings();
-                settings.MissingMemberHandling = MissingMemberHandling.Error;
-
-                if (this.clients.Contains(address))
-                {
-                    var request = JsonConvert.DeserializeObject<SIMCommon.Requests.Encrypted>(data, settings);
-                    this.OnReceivedClientRequest(e, data, address);
-                }
-                else
-                {
-                    var request = JsonConvert.DeserializeObject<SIMCommon.Requests.Base>(data, settings);
-                    this.OnReceivedUnknownRequest(e, data, address);
-                }
-            }
-            catch (JsonException)
-            {
-                this.Respond(SIMCommon.Constants.SIMServerInvalidRequestResponse);
             }
         }
     }

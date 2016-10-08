@@ -77,7 +77,7 @@
 
                 return false;
             }
-            catch (TcpClient.ConnectionFailiureException)
+            catch (Exception e) when (e is TcpClient.ConnectionFailiureException || e is Newtonsoft.Json.JsonReaderException)
             {
                 return false;
             }
@@ -162,10 +162,11 @@
 
         private void RunLeaseMonitor()
         {
+            System.Threading.Thread.Sleep(SIMCommon.Constants.LeaseMonitorDelay);
             while (true)
             {
                 int diff = (int)(DateTime.Now - this.LeaseStart).TotalMilliseconds;
-                if (diff < SIMCommon.Constants.LeaseMonitorDelay)
+                if (diff < this.LeaseDuration - SIMCommon.Constants.LeaseMonitorDelay)
                 {
                     var request = new SIMCommon.Requests.Renew();
                     var responseData = this.SendEncryptedRequest(request);
@@ -195,8 +196,10 @@
 
         private string SendEncryptedRequest(SIMCommon.Requests.Base request)
         {
-            var encryptedRequest = this.EncryptRequest(JsonConvert.SerializeObject(request));
-            var encryptedResponse = JsonConvert.DeserializeObject<SIMCommon.Responses.Encrypted>(TcpClient.Send(this.Address.ToString(), encryptedRequest));
+            string encryptedRequestData = this.EncryptRequest(JsonConvert.SerializeObject(request));
+            var encryptedRequest = JsonConvert.SerializeObject(new SIMCommon.Requests.Encrypted(this.PGPClient.EncryptedSessionKey, encryptedRequestData));
+            string response = TcpClient.Send(this.Address.ToString(), encryptedRequest);
+            var encryptedResponse = JsonConvert.DeserializeObject<SIMCommon.Responses.Encrypted>(response);
             string decrypted = this.PGPClient.Decrypt(encryptedResponse.EncryptedResponse, encryptedResponse.EncryptedSessionKey);
             if (decrypted == SIMCommon.Constants.SIMServerInvalidRequestResponse)
             {

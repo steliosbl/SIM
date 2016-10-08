@@ -19,7 +19,7 @@
 
             this.Clients = new Dictionary<IPAddress, SIMServer.Client>();
 
-            this.Listener = new SIMServer.Listener(SIMCommon.Constants.SIMServerPort, this.ClientRequestHandler, this.UnknownRequestHandler);
+            this.Listener = new SIMServer.Listener(SIMCommon.Constants.SIMServerPort, this.ProcessRequest);
 
             this.Database = new SIMServer.AuthDB(this.Config.ConnectionInfo);
 
@@ -33,10 +33,12 @@
                 this.Backlog = backlogInterface.GetObject<Backlog>();
             }
 
-            this.Listener.Start();
+            this.Logger = new SIMServer.Logger(SIMCommon.Constants.SIMServerLoggerFilename, true);
 
             this.LeaseMonitor = new Thread(() => this.MonitorLeases());
             this.LeaseMonitor.Start();
+
+            this.Listener.Start();
         }
 
         public Dictionary<IPAddress, Client> Clients { get; private set; }
@@ -51,216 +53,208 @@
 
         public Thread LeaseMonitor { get; private set; }
 
-        private void ClientRequestHandler(EventArgs e, string data, IPAddress address)
-        {
-            var encryptedRequest = JsonConvert.DeserializeObject<SIMCommon.Requests.Encrypted>(data);
-            if (this.Clients.Keys.Contains(address))
-            {
-                var targetClient = this.Clients[address];
-                if (!targetClient.CheckLeaseExpired(this.Config.LeaseDuration))
-                {
-                    string decryptedRequest = targetClient.PGPClient.Decrypt(encryptedRequest.EncryptedRequest, encryptedRequest.EncryptedSessionKey);
-                    string response = this.ProcessRequest(decryptedRequest, address);
-                    string encryptedResponse = targetClient.PGPClient.Encrypt(response, targetClient.PublicKey);
-                    this.Listener.Respond(encryptedResponse);
-                }
-                else
-                {
-                    var response = new SIMCommon.Responses.NoLease();
-                    this.Listener.Respond(JsonConvert.SerializeObject(response));
-                }
-            }
-            else
-            {
-                this.UnknownRequestHandler(e, data, address);
-            }
-        }
+        public Logger Logger { get; private set; }
 
-        private void UnknownRequestHandler(EventArgs e, string data, IPAddress address)
-        {
-            string response;
-            var baseRequest = JsonConvert.DeserializeObject<SIMCommon.Requests.Base>(data);
-            if (baseRequest.RequestType == typeof(SIMCommon.Requests.InitConnection))
-            {
-                if (!this.Clients.Keys.Contains(address))
-                {
-                    var request = JsonConvert.DeserializeObject<SIMCommon.Requests.InitConnection>(data);
-                    this.Clients.Add(address, new Client(address, request.PublicKey));
-                    var result = new SIMCommon.Responses.InitConnection(this.Clients[address].PGPClient.PublicKey, this.Config.LeaseDuration);
-                    response = JsonConvert.SerializeObject(result);
-                }
-                else
-                {
-                    response = SIMCommon.Constants.SIMServerInvalidRequestResponse;
-                }
-            }
-            else
-            {
-                response = SIMCommon.Constants.SIMServerInvalidRequestResponse;
-            }
-
-            this.Listener.Respond(response);
-        }
-
-        private string ProcessRequest(string decryptedRequest, IPAddress address)
+        private void ProcessRequest(EventArgs e, string data, IPAddress address)
         {
             string response = null;
-            var baseRequest = JsonConvert.DeserializeObject<SIMCommon.Requests.Base>(decryptedRequest);
-            if (baseRequest.LoggedInRequirement && this.Clients[address].User == null)
+            try
             {
+                if (this.Clients.ContainsKey(address))
+                {
+                    var encryptedRequest = JsonConvert.DeserializeObject<SIMCommon.Requests.Encrypted>(data);
+                    data = this.Clients[address].PGPClient.Decrypt(encryptedRequest.EncryptedRequest, encryptedRequest.EncryptedSessionKey);
+                }
+
+                var baseRequest = JsonConvert.DeserializeObject<SIMCommon.Requests.Base>(data);
+                Console.WriteLine(data);
+                this.Logger.Log("[" + address.ToString() + "] " + "REQUEST RECEIVED {" + baseRequest.RequestType.Name + "}");
+                dynamic request = JsonConvert.DeserializeObject(data, baseRequest.RequestType);
+                response = this.RequestHandler(address, request);
+            }
+            catch (JsonException)
+            {
+                this.Logger.Log("[" + address.ToString() + "] " + "INVALID REQUEST RECEIVED");
                 response = SIMCommon.Constants.SIMServerInvalidRequestResponse;
+            }
+            finally
+            {
+                this.Listener.Respond(response);
+            }
+        }
+
+        private string RequestHandler(IPAddress address, SIMCommon.Requests.Base request)
+        {
+            return SIMCommon.Constants.SIMServerInvalidRequestResponse;
+        }
+
+        private string RequestHandler(IPAddress address, SIMCommon.Requests.Authenticate request)
+        {
+            SIMCommon.Responses.Authenticate result;
+            if (this.Database.UserExists(request.Username))
+            {
+                result = new SIMCommon.Responses.Authenticate(this.Database.GetUser(this.Database.GetUserID(request.Username)).Authenticate(request.Password));
             }
             else
             {
-                if (baseRequest.RequestType == typeof(SIMCommon.Requests.Base))
-                {
-                    response = SIMCommon.Constants.SIMServerInvalidRequestResponse;
-                }
-                else if (baseRequest.RequestType == typeof(SIMCommon.Requests.Authenticate))
-                {
-                    var request = JsonConvert.DeserializeObject<SIMCommon.Requests.Authenticate>(decryptedRequest);
-                    SIMCommon.Responses.Authenticate result;
-                    if (this.Database.UserExists(request.Username))
-                    {
-                        result = new SIMCommon.Responses.Authenticate(this.Database.GetUser(this.Database.GetUserID(request.Username)).Authenticate(request.Password));
-                    }
-                    else
-                    {
-                        result = new SIMCommon.Responses.Authenticate(false);
-                    }
+                result = new SIMCommon.Responses.Authenticate(false);
+            }
 
-                    response = JsonConvert.SerializeObject(result);
-                }
-                else if (baseRequest.RequestType == typeof(SIMCommon.Requests.EndConnection))
-                {
-                    this.Clients.Remove(address);
-                    var result = new SIMCommon.Responses.EndConnection();
-                    response = JsonConvert.SerializeObject(result);
-                }
-                else if (baseRequest.RequestType == typeof(SIMCommon.Requests.Get))
-                {
-                    if (this.Clients[address].User != null)
-                    {
-                        var messages = this.Backlog.Messages[this.Clients[address].User.ID];
-                        var result = new SIMCommon.Responses.Get(messages);
-                        response = JsonConvert.SerializeObject(result);
-                    }
-                    else
-                    {
-                        response = JsonConvert.SerializeObject(new SIMCommon.Responses.Get(null));
-                    }
-                }
-                else if (baseRequest.RequestType == typeof(SIMCommon.Requests.GetProfiles))
-                {
-                    var profs = new Dictionary<int, SIMCommon.UserProfile>();
-                    foreach (var client in this.Clients.Values.ToList().FindAll(client => client.User != null))
-                    {
-                        profs.Add(client.User.ID, new SIMCommon.UserProfile(client.User.ID, client.User.Nickname, true));
-                    }
+           return JsonConvert.SerializeObject(result);
+        }
 
-                    var allProfiles = this.Database.GetProfiles();
-                    foreach (var profile in allProfiles.FindAll(profile => !profs.ContainsKey(profile.ID)))
-                    {
-                        profs.Add(profile.ID, profile);
-                    }
+        private string RequestHandler(IPAddress address, SIMCommon.Requests.EndConnection request)
+        {
+            this.Clients.Remove(address);
+            var result = new SIMCommon.Responses.EndConnection();
+            return JsonConvert.SerializeObject(result);
+        }
 
-                    var result = new SIMCommon.Responses.GetProfiles(profs.Values.ToList());
-                    response = JsonConvert.SerializeObject(result);
-                }
-                else if (baseRequest.RequestType == typeof(SIMCommon.Requests.Register))
-                {
-                    var request = JsonConvert.DeserializeObject<SIMCommon.Requests.Register>(decryptedRequest);
-                    if (!this.Database.UserExists(request.Username))
-                    {
-                        var newUser = new User(this.Database.GetLastUserID() + 1, request.Username, request.Password);
-                        this.Database.AddUser(newUser);
-                    }
-                }
-                else if (baseRequest.RequestType == typeof(SIMCommon.Requests.Ping))
-                {
-                    response = JsonConvert.SerializeObject(new SIMCommon.Responses.Ping(true));
-                }
-                else if (baseRequest.RequestType == typeof(SIMCommon.Requests.Renew))
-                {
-                    if (this.Clients[address].RemainingLeaseTime(this.Config.LeaseDuration) <= SIMCommon.Constants.LeaseMonitorDelay)
-                    {
-                        this.Clients[address].RenewLease();
-                        response = JsonConvert.SerializeObject(new SIMCommon.Responses.Renew());
-                    }
-                    else
-                    {
-                        response = SIMCommon.Constants.SIMServerInvalidRequestResponse;
-                    }
-                }
-                else if (baseRequest.RequestType == typeof(SIMCommon.Requests.Send))
-                {
-                    var request = JsonConvert.DeserializeObject<SIMCommon.Requests.Send>(decryptedRequest);
-                    SIMCommon.Responses.Send result;
-                    if (this.Database.UserExists(request.Message.RecipientID))
-                    {
-                        this.Backlog.Messages[request.Message.RecipientID].Add(request.Message);
-                        result = new SIMCommon.Responses.Send(true);
-                    }
-                    else
-                    {
-                        result = new SIMCommon.Responses.Send(false);
-                    }
+        private string RequestHandler(IPAddress address, SIMCommon.Requests.Get request)
+        {
+            if (this.Clients[address].User != null)
+            {
+                var messages = this.Backlog.Messages[this.Clients[address].User.ID];
+                var result = new SIMCommon.Responses.Get(messages);
+                return JsonConvert.SerializeObject(result);
+            }
+            else
+            {
+                return JsonConvert.SerializeObject(new SIMCommon.Responses.Get(null));
+            }
+        }
 
-                    response = JsonConvert.SerializeObject(result);
-                }
-                else if (baseRequest.RequestType == typeof(SIMCommon.Requests.SignIn))
-                {
-                    var request = JsonConvert.DeserializeObject<SIMCommon.Requests.SignIn>(decryptedRequest);
-                    SIMCommon.Responses.SignIn result;
-                    if (this.Database.UserExists(request.Username))
-                    {
-                        var user = this.Database.GetUser(this.Database.GetUserID(request.Username));
-                        if (user.Authenticate(request.Password))
-                        {
-                            this.Clients[address].LoadUser(user);
-                            result = new SIMCommon.Responses.SignIn(true);
-                        }
-                        else
-                        {
-                            result = new SIMCommon.Responses.SignIn(false);
-                        }
-                    }
-                    else
-                    {
-                        result = new SIMCommon.Responses.SignIn(false);
-                    }
+        private string RequestHandler(IPAddress address, SIMCommon.Requests.GetProfiles request)
+        {
+            var profs = new Dictionary<int, SIMCommon.UserProfile>();
+            foreach (var client in this.Clients.Values.ToList().FindAll(client => client.User != null))
+            {
+                profs.Add(client.User.ID, new SIMCommon.UserProfile(client.User.ID, client.User.Nickname, true));
+            }
 
-                    response = JsonConvert.SerializeObject(result);
-                }
-                else if (baseRequest.RequestType == typeof(SIMCommon.Requests.SignOut))
-                {
-                    this.Clients[address].RemoveUser();
-                    var result = new SIMCommon.Responses.SignOut();
-                    response = JsonConvert.SerializeObject(result);
-                }
-                else if (baseRequest.RequestType == typeof(SIMCommon.Requests.UserRef))
-                {
-                    var request = JsonConvert.DeserializeObject<SIMCommon.Requests.UserRef>(decryptedRequest);
-                    SIMCommon.Responses.UserRef result;
-                    if (this.Database.UserExists(request.Username))
-                    {
-                        var user = this.Database.GetUser(this.Database.GetUserID(request.Username));
-                        result = new SIMCommon.Responses.UserRef(new SIMCommon.UserProfile(user.ID, user.Nickname));
-                    }
-                    else
-                    {
-                        result = new SIMCommon.Responses.UserRef(null);
-                    }
+            var allProfiles = this.Database.GetProfiles();
+            foreach (var profile in allProfiles.FindAll(profile => !profs.ContainsKey(profile.ID)))
+            {
+                profs.Add(profile.ID, profile);
+            }
 
-                    response = JsonConvert.SerializeObject(result);
+            var result = new SIMCommon.Responses.GetProfiles(profs.Values.ToList());
+            return JsonConvert.SerializeObject(result);
+        }
+
+        private string RequestHandler(IPAddress address, SIMCommon.Requests.InitConnection request)
+        {
+            SIMCommon.Responses.InitConnection response;
+            if (!this.Clients.ContainsKey(address))
+            {
+                var newClient = new Client(address, request.PublicKey);
+                this.Clients.Add(address, newClient);
+                response = new SIMCommon.Responses.InitConnection(true, newClient.PGPClient.PublicKey, this.Config.LeaseDuration);
+            }
+            else
+            {
+                response = new SIMCommon.Responses.InitConnection(false);
+            }
+
+            return JsonConvert.SerializeObject(response);
+        }
+
+        private string RequestHandler(IPAddress address, SIMCommon.Requests.Register request)
+        {
+            SIMCommon.Responses.Register response = null;
+            if (!this.Database.UserExists(request.Username))
+            {
+                var newUser = new User(this.Database.GetLastUserID() + 1, request.Username, request.Password);
+                this.Database.AddUser(newUser);
+                response = new SIMCommon.Responses.Register(true);
+            }
+            else
+            {
+                response = new SIMCommon.Responses.Register(false);
+            }
+
+            return JsonConvert.SerializeObject(response);
+        }
+
+        private string RequestHandler(IPAddress address, SIMCommon.Requests.Ping request)
+        {
+            return JsonConvert.SerializeObject(new SIMCommon.Responses.Ping(true));
+        }
+
+        private string RequestHandler(IPAddress address, SIMCommon.Requests.Renew request)
+        {
+            if (this.Clients[address].RemainingLeaseTime(this.Config.LeaseDuration) <= SIMCommon.Constants.LeaseMonitorDelay)
+            {
+                this.Clients[address].RenewLease();
+                return JsonConvert.SerializeObject(new SIMCommon.Responses.Renew());
+            }
+            else
+            {
+                return SIMCommon.Constants.SIMServerInvalidRequestResponse;
+            }
+        }
+
+        private string RequestHandler(IPAddress address, SIMCommon.Requests.Send request)
+        {
+            SIMCommon.Responses.Send result;
+            if (this.Database.UserExists(request.Message.RecipientID))
+            {
+                this.Backlog.Messages[request.Message.RecipientID].Add(request.Message);
+                result = new SIMCommon.Responses.Send(true);
+            }
+            else
+            {
+                result = new SIMCommon.Responses.Send(false);
+            }
+
+            return JsonConvert.SerializeObject(result);
+        }
+
+        private string RequestHandler(IPAddress address, SIMCommon.Requests.SignIn request)
+        { 
+            SIMCommon.Responses.SignIn result;
+            if (this.Database.UserExists(request.Username))
+            {
+                var user = this.Database.GetUser(this.Database.GetUserID(request.Username));
+                if (user.Authenticate(request.Password))
+                {
+                    this.Clients[address].LoadUser(user);
+                    result = new SIMCommon.Responses.SignIn(true);
                 }
                 else
                 {
-                    response = SIMCommon.Constants.SIMServerInvalidRequestResponse;
+                    result = new SIMCommon.Responses.SignIn(false);
                 }
             }
+            else
+            {
+                result = new SIMCommon.Responses.SignIn(false);
+            }
 
-            return response;
+            return JsonConvert.SerializeObject(result);
+        }
+
+        private string RequestHandler(IPAddress address, SIMCommon.Requests.SignOut request)
+        {
+            this.Clients[address].RemoveUser();
+            var result = new SIMCommon.Responses.SignOut();
+            return JsonConvert.SerializeObject(result);
+        }
+
+        private string RequestHandler(IPAddress address, SIMCommon.Requests.UserRef request)
+        {
+            SIMCommon.Responses.UserRef result;
+            if (this.Database.UserExists(request.Username))
+            {
+                var user = this.Database.GetUser(this.Database.GetUserID(request.Username));
+                result = new SIMCommon.Responses.UserRef(new SIMCommon.UserProfile(user.ID, user.Nickname));
+            }
+            else
+            {
+                result = new SIMCommon.Responses.UserRef(null);
+            }
+
+            return JsonConvert.SerializeObject(result);
         }
 
         private bool CheckUserActive(int id)
@@ -287,12 +281,11 @@
         {
             while (true)
             {
-                foreach (var client in this.Clients.Keys)
+                foreach (var client in this.Clients.Keys.ToList())
                 {
-                    if (!this.Clients[client].CheckLeaseExpired(this.Config.LeaseDuration))
+                    if (this.Clients[client].CheckLeaseExpired(this.Config.LeaseDuration))
                     {
                         this.Clients.Remove(client);
-                        this.Listener.UpdateClients(this.Clients.Keys.ToList());
                     }
                 }
 
