@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SIMServer", "SIMServer\SIMS
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SIMCommon", "SIMCommon\SIMCommon.csproj", "{463CB016-6B99-4BDE-851F-560006EAEE00}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client", "Client\Client.csproj", "{771D85D4-25B6-4272-BCAB-D8DA01977A2E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Server", "Server\Server.csproj", "{11288AE5-19B6-4DAB-ABA8-25D3E166F17D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +31,14 @@ Global
 		{463CB016-6B99-4BDE-851F-560006EAEE00}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{463CB016-6B99-4BDE-851F-560006EAEE00}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{463CB016-6B99-4BDE-851F-560006EAEE00}.Release|Any CPU.Build.0 = Release|Any CPU
+		{771D85D4-25B6-4272-BCAB-D8DA01977A2E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{771D85D4-25B6-4272-BCAB-D8DA01977A2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{771D85D4-25B6-4272-BCAB-D8DA01977A2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{771D85D4-25B6-4272-BCAB-D8DA01977A2E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{11288AE5-19B6-4DAB-ABA8-25D3E166F17D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{11288AE5-19B6-4DAB-ABA8-25D3E166F17D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{11288AE5-19B6-4DAB-ABA8-25D3E166F17D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{11288AE5-19B6-4DAB-ABA8-25D3E166F17D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
