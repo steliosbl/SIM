@@ -8,7 +8,7 @@
     using Newtonsoft.Json;
     using SCrypto;
 
-    public class Server : IDisposable
+    public class Server
     {
         public Server(IPAddress address)
         {
@@ -71,7 +71,7 @@
                     var convertedResponse = JsonConvert.DeserializeObject<SIMCommon.Responses.InitConnection>(response);
                     this.ServerPublicKey = convertedResponse.PublicKey;
                     this.LeaseDuration = convertedResponse.LeaseDuration;
-                    this.LeaseMonitor.Start();
+                    //this.LeaseMonitor.Start();
                     return true;
                 }
 
@@ -151,13 +151,6 @@
             {
                 return null;
             }
-        }
-
-        public void Dispose()
-        {
-            var request = new SIMCommon.Requests.EndConnection();
-            this.SendEncryptedRequest(request);
-            this.LeaseMonitor.Abort();
         }
 
         private void RunLeaseMonitor()

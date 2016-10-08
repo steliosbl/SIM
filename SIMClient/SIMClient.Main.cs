@@ -7,7 +7,7 @@
     using System.Text;
     using System.Threading.Tasks;
 
-    public class Main : IDisposable
+    public class Main
     {
         public Main(IPAddress address)
         {
@@ -92,12 +92,6 @@
         public void ReloadThread()
         {
             this.LoadThread(this.CurrentThread.ID);
-        }
-
-        public void Dispose()
-        {
-            this.GetClock.Abort();
-            this.Server.Dispose();
         }
 
         private void GetMessages()
