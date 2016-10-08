@@ -67,7 +67,6 @@
                 }
 
                 var baseRequest = JsonConvert.DeserializeObject<SIMCommon.Requests.Base>(data);
-                Console.WriteLine(data);
                 this.Logger.Log("[" + address.ToString() + "] " + "REQUEST RECEIVED {" + baseRequest.RequestType.Name + "}");
                 dynamic request = JsonConvert.DeserializeObject(data, baseRequest.RequestType);
                 response = this.RequestHandler(address, request);
