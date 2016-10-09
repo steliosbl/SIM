@@ -120,7 +120,12 @@
         {
             if (this.Clients[address].User != null)
             {
-                var messages = this.Backlog.Messages[this.Clients[address].User.ID];
+                var messages = new List<SIMCommon.Message>();
+                if (this.Backlog.Messages.ContainsKey(this.Clients[address].User.ID))
+                {
+                    messages = this.Backlog.Messages[this.Clients[address].User.ID];
+                }
+
                 var result = new SIMCommon.Responses.Get(messages);
                 return JsonConvert.SerializeObject(result);
             }

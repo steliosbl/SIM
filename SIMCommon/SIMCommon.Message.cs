@@ -13,7 +13,6 @@
             this.Timestamp = DateTime.Now;
         }
 
-        [JsonConstructor]
         public Message(int senderID, int recipientID, string text, DateTime timestamp)
         {
             this.SenderID = senderID;
