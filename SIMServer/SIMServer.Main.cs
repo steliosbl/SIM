@@ -58,9 +58,10 @@
         private void ProcessRequest(EventArgs e, string data, IPAddress address)
         {
             string response = null;
+            bool encrypt = this.Clients.ContainsKey(address);
             try
             {
-                if (this.Clients.ContainsKey(address))
+                if (encrypt)
                 {
                     var encryptedRequest = JsonConvert.DeserializeObject<SIMCommon.Requests.Encrypted>(data);
                     data = this.Clients[address].PGPClient.Decrypt(encryptedRequest.EncryptedRequest, encryptedRequest.EncryptedSessionKey);
@@ -78,6 +79,12 @@
             }
             finally
             {
+                if (encrypt)
+                {
+                    string encryptedResponse = this.Clients[address].PGPClient.Encrypt(response, this.Clients[address].PublicKey);
+                    response = JsonConvert.SerializeObject(new SIMCommon.Responses.Encrypted(this.Clients[address].PGPClient.EncryptedSessionKey, encryptedResponse));
+                }
+
                 this.Listener.Respond(response);
             }
         }

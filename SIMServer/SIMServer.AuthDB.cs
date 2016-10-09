@@ -23,13 +23,13 @@
 
         public int GetLastUserID()
         {
-            using (var cmd = new MySqlCommand("SELECT MAX (ID) FROM " + SIMCommon.Constants.SIMServerAuthDatabaseUserTable + ";", this.Connection))
+            using (var cmd = new MySqlCommand("SELECT MAX(ID) FROM " + SIMCommon.Constants.SIMServerAuthDatabaseUserTable + ";", this.Connection))
             {
                 try
                 {
                     return System.Convert.ToInt32(cmd.ExecuteScalar());
                 }
-                catch (FormatException)
+                catch (System.InvalidCastException)
                 {
                     // Caused if there are no users in the table.
                     return 0;
@@ -47,7 +47,12 @@
                     cmd.Parameters.AddWithValue("@username", username);
                     using (var rdr = cmd.ExecuteReader())
                     {
-                        return System.Convert.ToInt32(rdr["ID"]);
+                        while (rdr.Read())
+                        {
+                            return System.Convert.ToInt32(rdr["ID"]);
+                        }
+
+                        throw new ArgumentException("User does not exist.");
                     }
                 }
             }
