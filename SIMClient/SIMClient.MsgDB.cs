@@ -14,6 +14,7 @@
         {
             this.ConnectionString = new ConnectionString(SIMCommon.Constants.SIMClientDatabaseFilename, 3);
             this.Connection = new SQLiteConnection(this.ConnectionString.Text);
+            this.Connection.Open();
         }
 
         private ConnectionString ConnectionString { get; set; }

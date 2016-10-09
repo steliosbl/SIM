@@ -117,15 +117,7 @@
             try
             {
                 var response = JsonConvert.DeserializeObject<SIMCommon.Responses.SignIn>(this.SendEncryptedRequest(signInRequest));
-                if (response.Success)
-                {
-                    this.GetProfiles();
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
+                return response.Success;
             }
             catch (InvalidResponseException)
             {

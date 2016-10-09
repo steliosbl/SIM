@@ -23,7 +23,10 @@ namespace Client
         {
             if (this.client.SignIn(usernameTextBox.Text, passwordTextBox.Text))
             {
-                
+                var f = new MainForm(this.client);
+                this.Hide();
+                f.FormClosed += (s, args) => this.Close();
+                f.Show();
             }
             else
             {
