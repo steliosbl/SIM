@@ -61,6 +61,11 @@
             bool encrypt = this.Clients.ContainsKey(address);
             try
             {
+                if (string.IsNullOrWhiteSpace(data) || string.IsNullOrEmpty(data))
+                {
+                    throw new JsonException();
+                }
+
                 if (encrypt)
                 {
                     var encryptedRequest = JsonConvert.DeserializeObject<SIMCommon.Requests.Encrypted>(data);
