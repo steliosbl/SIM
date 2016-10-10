@@ -51,7 +51,7 @@
 
         public bool ThreadExists(int id)
         {
-            using (var cmd = new SQLiteCommand("SELECT EXISTS(SELECT * FROM " + SIMCommon.Constants.SIMClientDatabaseMessageTable + " WHERE ID = @id LIMIT 1);", this.Connection))
+            using (var cmd = new SQLiteCommand("SELECT EXISTS(SELECT * FROM " + SIMCommon.Constants.SIMClientDatabaseThreadTable + " WHERE ID = @id LIMIT 1);", this.Connection))
             {
                 cmd.Prepare();
                 cmd.Parameters.AddWithValue("@id", id);
@@ -64,7 +64,7 @@
             Thread result = null;
             if (this.ThreadExists(id))
             {
-                using (var cmd = new SQLiteCommand("SELECT * FROM " + SIMCommon.Constants.SIMClientDatabaseMessageTable + " WHERE ID = @id;", this.Connection))
+                using (var cmd = new SQLiteCommand("SELECT * FROM " + SIMCommon.Constants.SIMClientDatabaseThreadTable + " WHERE ID = @id;", this.Connection))
                 {
                     cmd.Prepare();
                     cmd.Parameters.AddWithValue("@id", id);
