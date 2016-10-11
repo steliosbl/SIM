@@ -17,11 +17,21 @@
             var configInterface = new SIMCommon.JsonFileInterface(SIMCommon.Constants.SIMServerConfigFilename);
             this.Config = configInterface.GetObject<Config>();
 
+            this.Logger = new SIMServer.Logger(SIMCommon.Constants.SIMServerLoggerFilename, true);
+
             this.Clients = new Dictionary<IPAddress, SIMServer.Client>();
 
             this.Listener = new SIMServer.Listener(SIMCommon.Constants.SIMServerPort, this.ProcessRequest);
 
-            this.Database = new SIMServer.AuthDB(this.Config.ConnectionInfo);
+            try
+            {
+                this.Database = new SIMServer.AuthDB(this.Config.ConnectionInfo);
+            }
+            catch (MySql.Data.MySqlClient.MySqlException)
+            {
+                this.Logger.Log("UNABLE TO CONNECT TO AUTH DATABASE", 3);
+                Environment.Exit(1);
+            }
 
             if (!File.Exists(SIMCommon.Constants.SIMServerBacklogFilename) || File.ReadAllText(SIMCommon.Constants.SIMServerBacklogFilename).Trim().Length == 0)
             {
@@ -32,8 +42,6 @@
                 var backlogInterface = new SIMCommon.JsonFileInterface(SIMCommon.Constants.SIMServerBacklogFilename);
                 this.Backlog = backlogInterface.GetObject<Backlog>();
             }
-
-            this.Logger = new SIMServer.Logger(SIMCommon.Constants.SIMServerLoggerFilename, true);
 
             this.LeaseMonitor = new Thread(() => this.MonitorLeases());
             this.LeaseMonitor.Start();
