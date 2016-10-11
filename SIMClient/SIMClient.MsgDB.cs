@@ -98,5 +98,18 @@
 
             return result;
         }
+
+        public bool AddThread(Thread thread)
+        {
+            if (!this.ThreadExists(thread.ID))
+            {
+                SDatabase.SQLite.Convert.SerializeObject(this.Connection, thread, SIMCommon.Constants.SIMClientDatabaseThreadTable);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
     }
 }
